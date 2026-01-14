@@ -1,0 +1,44 @@
+version: "3"
+
+tasks:
+  default:
+    desc: Show available tasks
+    cmds:
+      - task --list
+
+  taggen:
+    desc: Generate Docker image tag (go-version + random-name)
+    dir: scripts/taggen
+    cmds:
+      - go run .
+
+  taggen:name:
+    desc: Generate only random name
+    dir: scripts/taggen
+    cmds:
+      - go run . --name
+
+  taggen:version:
+    desc: Show Go version for tag
+    dir: scripts/taggen
+    cmds:
+      - go run . --version
+
+  docker:build:
+    desc: Build go-toolbox Docker image with generated tag
+    vars:
+      TAG:
+        sh: cd scripts/taggen && go run .
+    cmds:
+      - docker build -t ghcr.io/inovacc/go-toolbox:{{.TAG}} -t ghcr.io/inovacc/go-toolbox:latest .
+      - echo "Built ghcr.io/inovacc/go-toolbox:{{.TAG}}"
+
+  docker:build:local:
+    desc: Build go-toolbox Docker image with local tag
+    cmds:
+      - docker build -t go-toolbox:local .
+
+  docker:test:
+    desc: Test go-toolbox image tools
+    cmds:
+      - docker run --rm go-toolbox:local
