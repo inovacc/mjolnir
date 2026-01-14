@@ -1,5 +1,13 @@
 # Go Toolbox Builder
 
+[![GHCR](https://img.shields.io/badge/GHCR-ghcr.io%2Finovacc%2Fgo--toolbox-blue?logo=docker)](https://github.com/inovacc/go-toolbox/pkgs/container/go-toolbox)
+[![CI](https://github.com/inovacc/go-toolbox/actions/workflows/ci.yml/badge.svg)](https://github.com/inovacc/go-toolbox/actions/workflows/ci.yml)
+[![License](https://img.shields.io/github/license/inovacc/go-toolbox)](LICENSE)
+
+```bash
+docker pull ghcr.io/inovacc/go-toolbox:latest
+```
+
 🚀 Go Production Builder – GitHub Actions Toolbox
 
 A hardened GitHub Actions job-container image for building production-grade Go binaries and distroless container images.
