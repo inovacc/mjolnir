@@ -1,0 +1,45 @@
+version: "3"
+
+vars:
+  BINARY_NAME: api
+
+tasks:
+  default:
+    desc: Show available tasks
+    cmds:
+      - task --list
+
+  build:dev:
+    desc: Build development binary (current platform)
+    cmds:
+      - goreleaser build --snapshot --clean --single-target
+
+  build:prod:
+    desc: Build production binaries (Linux amd64/arm64)
+    cmds:
+      - goreleaser build --snapshot --clean
+
+  run:
+    desc: Run the application locally
+    cmds:
+      - go run .
+
+  test:
+    desc: Run tests
+    cmds:
+      - go test -v -race ./...
+
+  clean:
+    desc: Clean build artifacts
+    cmds:
+      - rm -rf dist/
+
+  docker:build:
+    desc: Build Docker image
+    cmds:
+      - docker build -t api:local .
+
+  docker:run:
+    desc: Run Docker container
+    cmds:
+      - docker run --rm -p 8080:8080 api:local
