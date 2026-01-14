@@ -1,0 +1,118 @@
+name: Scheduled Build
+
+on:
+  schedule:
+    # Run every two weeks on Monday at 00:00 UTC
+    - cron: '0 0 1,15 * *'
+  workflow_dispatch: # Allow manual trigger
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  GO_VERSION: "1.25"
+
+jobs:
+  taggen:
+    runs-on: ubuntu-latest
+    outputs:
+      random_name: ${{ steps.generate.outputs.random_name }}
+      tag_alpine: ${{ steps.generate.outputs.tag_alpine }}
+      tag_debian: ${{ steps.generate.outputs.tag_debian }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate build tags
+        id: generate
+        run: |
+          chmod +x ./scripts/taggen.sh
+          RANDOM_NAME=$(./scripts/taggen.sh --name)
+          TAG_ALPINE="${GO_VERSION}A-${RANDOM_NAME}"
+          TAG_DEBIAN="${GO_VERSION}D-${RANDOM_NAME}"
+
+          echo "random_name=${RANDOM_NAME}" >> $GITHUB_OUTPUT
+          echo "tag_alpine=${TAG_ALPINE}" >> $GITHUB_OUTPUT
+          echo "tag_debian=${TAG_DEBIAN}" >> $GITHUB_OUTPUT
+
+          echo "Generated tags:"
+          echo "  Alpine: ${TAG_ALPINE}"
+          echo "  Debian: ${TAG_DEBIAN}"
+
+  build-and-push-debian:
+    runs-on: ubuntu-latest
+    needs: taggen
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create build metadata
+        run: |
+          mkdir -p .build-metadata
+          echo "${{ needs.taggen.outputs.tag_debian }}" > .build-metadata/BUILD_TAG
+          echo "${GO_VERSION}" > .build-metadata/GO_VERSION
+          echo "${{ needs.taggen.outputs.random_name }}" > .build-metadata/BUILD_NAME
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Debian image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile.debian
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:debian
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.taggen.outputs.tag_debian }}
+          cache-from: type=gha,scope=debian
+          cache-to: type=gha,mode=max,scope=debian
+
+      - name: Verify Debian image
+        run: docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:debian
+
+  build-and-push-alpine:
+    runs-on: ubuntu-latest
+    needs: taggen
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create build metadata
+        run: |
+          mkdir -p .build-metadata
+          echo "${{ needs.taggen.outputs.tag_alpine }}" > .build-metadata/BUILD_TAG
+          echo "${GO_VERSION}" > .build-metadata/GO_VERSION
+          echo "${{ needs.taggen.outputs.random_name }}" > .build-metadata/BUILD_NAME
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Alpine image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile.alpine
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:alpine
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.taggen.outputs.tag_alpine }}
+          cache-from: type=gha,scope=alpine
+          cache-to: type=gha,mode=max,scope=alpine
+
+      - name: Verify Alpine image
+        run: docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:alpine
