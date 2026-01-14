@@ -7,6 +7,8 @@ A minimal Go web API demonstrating how to use [go-toolbox](https://github.com/in
 ```
 example/
 ├── main.go              # Application entrypoint
+├── cmd/root.go          # Cobra CLI root command
+├── internal/api/api.go  # HTTP server and handlers
 ├── Dockerfile           # Multi-stage build (go-toolbox + distroless)
 ├── Taskfile.yml         # Build automation
 ├── .goreleaser.yml      # Release configuration

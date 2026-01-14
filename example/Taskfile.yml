@@ -1,8 +1,5 @@
 version: "3"
 
-vars:
-  BINARY_NAME: api
-
 tasks:
   default:
     desc: Show available tasks
@@ -43,33 +40,3 @@ tasks:
     desc: Run Docker container
     cmds:
       - docker run --rm -p 8080:8080 api:local
-
-  # === CODE QUALITY ===
-  fmt:
-    desc: Format all Go code
-    cmds:
-      - go fmt ./...
-      - goimports -w .
-
-  vet:
-    desc: Run go vet static analysis
-    cmds:
-      - go vet ./...
-
-  lint:
-    desc: Run golangci-lint
-    cmds:
-      - golangci-lint run ./...
-
-  lint:fix:
-    desc: Run linter and auto-fix issues
-    cmds:
-      - golangci-lint run --fix ./... --timeout=5m
-
-  check:
-    desc: Run all quality checks (fmt, vet, lint, test)
-    cmds:
-      - task: fmt
-      - task: vet
-      - task: lint
-      - task: test
