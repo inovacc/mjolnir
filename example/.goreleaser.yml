@@ -111,7 +111,6 @@ changelog:
 # Release configuration
 release:
   github:
-    owner: "{{ .Env.GITHUB_OWNER }}"
     name: "{{ .ProjectName }}"
   draft: false
   prerelease: auto
