@@ -30,6 +30,38 @@ docker pull ghcr.io/inovacc/go-toolbox:latest
 | protoc-gen-go | 1.28.0 | Go protobuf generator |
 | protoc-gen-go-grpc | 1.2.0 | Go gRPC generator |
 
+## Image Tagging
+
+Generate semantic image tags with Go version and random identifier:
+
+```bash
+# Generate tag: <go-version>-<adjective>-<animal>
+task taggen
+# Output: 1.25-sharp-otter
+
+# Build with generated tag
+task docker:build
+# Output: ghcr.io/inovacc/go-toolbox:1.25-sharp-otter
+```
+
+### Tag Format
+
+| Component | Example | Purpose |
+|-----------|---------|---------|
+| Go version | `1.25` | Identify Go toolchain version |
+| Random name | `sharp-otter` | Identify build changes |
+
+### Available Tasks
+
+```bash
+task taggen           # Full tag: 1.25-sharp-otter
+task taggen:version   # Go version only: 1.25
+task taggen:name      # Random name only: sharp-otter
+task docker:build     # Build with generated tag
+task docker:build:local  # Build with local tag
+task docker:test      # Test image tools
+```
+
 ## Quick Start
 
 ### Use as GitHub Actions Job Container
