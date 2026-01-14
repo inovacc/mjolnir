@@ -1,0 +1,22 @@
+# Git
+.git
+.gitignore
+
+# GitHub
+.github
+
+# IDE
+.idea
+.vscode
+*.iml
+
+# Claude
+.claude
+tmpclaude-*
+
+# Documentation
+*.md
+LICENSE
+
+# Docker
+Dockerfile.distroless
