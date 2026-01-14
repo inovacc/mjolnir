@@ -1,236 +1,126 @@
 # Go Toolbox Builder
 
 [![GHCR](https://img.shields.io/badge/GHCR-ghcr.io%2Finovacc%2Fgo--toolbox-blue?logo=docker)](https://github.com/inovacc/go-toolbox/pkgs/container/go-toolbox)
-[![CI](https://github.com/inovacc/go-toolbox/actions/workflows/ci.yml/badge.svg)](https://github.com/inovacc/go-toolbox/actions/workflows/ci.yml)
+[![CI Workflow](https://github.com/inovacc/go-toolbox/actions/workflows/ci.yml/badge.svg)](https://github.com/inovacc/go-toolbox/actions/workflows/ci.yml)
 [![License](https://img.shields.io/github/license/inovacc/go-toolbox)](LICENSE)
+
+A hardened GitHub Actions job-container image for building production-grade Go binaries.
 
 ```bash
 docker pull ghcr.io/inovacc/go-toolbox:latest
 ```
 
-🚀 Go Production Builder – GitHub Actions Toolbox
+## Features
 
-A hardened GitHub Actions job-container image for building production-grade Go binaries and distroless container images.
+- **GoReleaser** - Build static Linux Go binaries
+- **Task** - Task runner for build automation
+- **Protobuf** - Protocol Buffer compiler with Go plugins
+- **SQLC** - Type-safe SQL code generator
+- **Security** - Hadolint linting + Trivy vulnerability scanning
 
-This repository provides a standardized Go toolbox builder image designed to run as a GitHub Actions job container, execute task build:production (GoReleaser), and generate minimal distroless production images ready for Kubernetes and cloud deployment.
+## Included Tools
 
-Production GitHub Actions toolbox for GoReleaser + distroless images.
+| Tool | Version | Purpose |
+|------|---------|---------|
+| Go | 1.25 | Go toolchain |
+| Task | 3.39.2 | Task runner |
+| GoReleaser | 2.6.1 | Release automation |
+| SQLC | 1.27.0 | SQL code generator |
+| Protoc | 33.4 | Protocol Buffer compiler |
+| protoc-gen-go | 1.28.0 | Go protobuf generator |
+| protoc-gen-go-grpc | 1.2.0 | Go gRPC generator |
 
-✨ What it does
+## Quick Start
 
-Builds static Linux Go binaries using GoReleaser
+### Use as GitHub Actions Job Container
 
-Supports private GitHub repositories and modules
-
-Produces ultra-minimal distroless images (static-debian13:nonroot)
-
-Fully reproducible and version-pinned toolchain
-
-CI-first, Docker-socket-free design (secure by default)
-
-Optimized for large multi-repo enterprise environments
-
-🛡️ Security & Compliance
-
-No credentials baked into image layers
-
-Secure ephemeral secret handling with BuildKit secrets
-
-Distroless runtime = no shell, no package manager, no CVE noise
-
-Rootless container execution (nonroot)
-
-🧩 CI Architecture
-GitHub Actions
-┌──────────────┐
-│ Toolbox Job  │ → GoReleaser builds static binaries
-└──────┬───────┘
-│  artifacts
-┌──────▼───────┐
-│ Runner Job   │ → distroless image build + push to GHCR
-└──────────────┘
-
-🐳 Runtime Image Example
-FROM gcr.io/distroless/static-debian13:nonroot
-COPY dist/myapp /myapp
-ENTRYPOINT ["/myapp"]
-
-🧪 Typical workflow
-container:
-image: ghcr.io/<org>/go-toolbox-builder:1.0.0
-
-steps:
-- uses: actions/checkout@v4
-- run: task build:production
-
-
-Dockerfile.distroless
-
-````docker
-# ----------------
-# GOOGLE DISTROLESS WITH SSL
-# ----------------
-FROM gcr.io/distroless/static-debian13:nonroot
-
-# Path INSIDE the build context, passed by build arg
-ARG BIN_PATH=dist/myapp
-
-COPY ${BIN_PATH} /myapp
-
-EXPOSE 3005
-
-USER nonroot:nonroot
-
-CMD ["./main"]
-````
-
-GitHub Actions workflow: build with GoReleaser in job container, then build image on runner
-
-````yaml
-name: build
-
-on:
-push:
-branches: [ "main" ]
-
+```yaml
 jobs:
-build-dist:
-runs-on: ubuntu-latest
-container:
-image: ghcr.io/<org>/<repo>/go-toolbox:1.0.0
-env:
-# For private modules (adjust org)
-GOPRIVATE: github.com/<ORG>/*
-GONOSUMDB: github.com/<ORG>/*
-GIT_TERMINAL_PROMPT: "0"
-steps:
-- uses: actions/checkout@v4
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/inovacc/go-toolbox:latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: task build:prod
+```
 
-      # If you need to fetch private deps across repos, prefer a PAT:
-      - name: Configure git auth for private modules
-        if: ${{ secrets.GH_PAT != '' }}
-        shell: bash
+### Use with Private Modules
+
+```yaml
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/inovacc/go-toolbox:latest
+      env:
+        GOPRIVATE: github.com/your-org/*
+        GONOSUMDB: github.com/your-org/*
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure git auth
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
         run: |
-          git config --global url."https://${GH_PAT}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
+          git config --global url."https://${GH_PAT}@github.com/".insteadOf "https://github.com/"
 
-      - name: Build production (GoReleaser via Task)
-        run: task build:production
+      - run: task build:prod
+```
 
-      - name: Upload dist artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: dist
-          path: dist/
+## Creating Distroless Production Images
 
-build-image:
-runs-on: ubuntu-latest
-needs: build-dist
-permissions:
-contents: read
-packages: write
-steps:
-- uses: actions/checkout@v4
+After building your Go binary, create a minimal production image:
 
-      - uses: actions/download-artifact@v4
-        with:
-          name: dist
-          path: dist/
+```dockerfile
+FROM gcr.io/distroless/static-debian13:nonroot
+ARG BIN_PATH=dist/myapp
+COPY ${BIN_PATH} /app
+USER nonroot:nonroot
+ENTRYPOINT ["/app"]
+```
 
-      # Find the produced linux binary path (first match)
-      - name: Detect linux binary path
-        id: bin
-        shell: bash
-        run: |
-          set -euo pipefail
-          # Look for an executable named exactly "myapp" inside dist/
-          BIN="$(find dist -type f -name myapp -perm -111 | head -n 1)"
-          if [ -z "${BIN}" ]; then
-            echo "Could not find executable 'myapp' inside dist/"
-            find dist -maxdepth 3 -type f -print
-            exit 1
-          fi
-          echo "bin_path=${BIN}" >> "$GITHUB_OUTPUT"
-          echo "Detected: ${BIN}"
+**Why distroless?**
+- No shell, no package manager = minimal attack surface
+- ~2MB base image vs ~100MB+ for alpine
+- No CVE noise from unused packages
+- Runs as non-root by default
 
-      - uses: docker/setup-buildx-action@v3
+## CI Pipeline
 
-      - name: Login to GHCR
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+```
+lint → build → security → release
+```
 
-      - name: Build & push distroless image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: ./Dockerfile.distroless
-          push: true
-          build-args: |
-            BIN_PATH=${{ steps.bin.outputs.bin_path }}
-          tags: |
-            ghcr.io/<org>/<repo>:${{ github.sha }}
-            ghcr.io/<org>/<repo>:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-````
+| Job | Description |
+|-----|-------------|
+| `lint` | Hadolint Dockerfile best practices |
+| `build` | Build image and verify all tools |
+| `security` | Trivy vulnerability scan (CRITICAL, HIGH) |
+| `release` | Push to GHCR (on tags only) |
 
-````yaml
+## Sample Taskfile
+
+```yaml
 version: 3
 
-vars:
-  MAIN_PACKAGE: .
-  GITHUB_OWNER:
-    sh: echo "${GITHUB_OWNER:-github.com/your-org}"
-
 tasks:
-  # === INFORMATION ===
-  default:
-    desc: List all available tasks
-    cmds:
-      - task --list
-
-  # === BUILD TASKS ===
   build:dev:
-    desc: Build development snapshot with goreleaser
-    deps: [ generate ]
-    env:
-      GITHUB_OWNER: "{{.GITHUB_OWNER}}"
+    desc: Build development snapshot
     cmds:
       - goreleaser build --snapshot --clean
 
   build:prod:
-    desc: Build production snapshot with goreleaser
-    deps: [ generate ]
-    env:
-      GITHUB_OWNER: "{{.GITHUB_OWNER}}"
+    desc: Build production snapshot
     cmds:
-      - goreleaser --snapshot --skip-publish,announce --rm-dist
+      - goreleaser build --snapshot --clean
 
-  # === RELEASE TASKS ===
   release:
-    desc: Create a production release with goreleaser (requires git tag)
-    deps: [ generate ]
-    env:
-      GITHUB_OWNER: "{{.GITHUB_OWNER}}"
+    desc: Create production release (requires git tag)
     cmds:
       - goreleaser release --clean
+```
 
-  release:snapshot:
-    desc: Create a snapshot release (no git tag required)
-    deps: [ generate ]
-    env:
-      GITHUB_OWNER: "{{.GITHUB_OWNER}}"
-    cmds:
-      - goreleaser release --snapshot --clean
+## License
 
-  release:check:
-    desc: Validate goreleaser configuration
-    env:
-      GITHUB_OWNER: "{{.GITHUB_OWNER}}"
-    cmds:
-      - goreleaser check
-````
+[MIT](LICENSE)

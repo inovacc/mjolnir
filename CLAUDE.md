@@ -8,17 +8,16 @@ This is a GitHub Actions job-container image (Go Toolbox Builder) for building p
 
 ## Architecture
 
-The repository provides two Docker images working in a CI pipeline:
-
-1. **Toolbox Image** (`Dockerfile`) - Based on `golang:1.25`, used as a GitHub Actions job container to run GoReleaser builds via `task build:prod`
-
-2. **Distroless Runtime Image** (`Dockerfile.distroless`) - Based on `gcr.io/distroless/static-debian13:nonroot`, minimal production image containing only the compiled binary
+This repository provides the **Toolbox Image** (`Dockerfile`) - Based on `golang:1.25`, used as a GitHub Actions job container to run GoReleaser builds via `task build:prod`.
 
 ### CI Flow
 ```
-Toolbox Job Container → GoReleaser builds static binaries → artifacts
-                                                              ↓
-Runner Job → builds distroless image with binary → pushes to GHCR
+lint → build → security → release
+  │      │        │          │
+  │      │        │          └── Push to GHCR (tags only)
+  │      │        └── Trivy vulnerability scan
+  │      └── Build & verify tools
+  └── Hadolint Dockerfile check
 ```
 
 ## Usage Context
@@ -93,9 +92,9 @@ Projects using this toolbox typically define these tasks:
 
 ## Key Files
 
-- `Dockerfile` - Toolbox builder image definition
-- `Dockerfile.distroless` - Minimal production runtime image template
-- `.github/workflows/ci.yml` - CI pipeline configuration
+- `Dockerfile` - Toolbox builder image definition (multi-stage)
+- `.github/workflows/ci.yml` - CI pipeline with lint, build, security, release
+- `.dockerignore` - Excludes unnecessary files from build context
 
 ## Environment Variables (when used in workflows)
 
@@ -108,8 +107,21 @@ Projects using this toolbox typically define these tasks:
 ## CI/CD Pipeline
 
 ### Triggers
-- **Tags (`v*`)**: Build and push to GHCR with SemVer tags
-- **Pull Requests**: Build and validate without pushing
+- **Tags (`v*`)**: Build, scan, and push to GHCR with SemVer tags
+- **Pull Requests**: Lint, build, and security scan without pushing
+
+### Jobs
+| Job | Purpose |
+|-----|---------|
+| `lint` | Hadolint Dockerfile best practices |
+| `build` | Build image and verify tools |
+| `security` | Trivy vulnerability scan (CRITICAL, HIGH) |
+| `release` | Push to GHCR (tags only) |
+
+### Security Features
+- **Hadolint** - Dockerfile linting for best practices
+- **Trivy** - CVE vulnerability scanning
+- **SARIF** - Results uploaded to GitHub Security tab
 
 ### Release Process
 ```bash
