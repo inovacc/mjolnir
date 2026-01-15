@@ -62,17 +62,17 @@ COPY --from=builder /usr/local/bin/protoc /usr/local/bin/protoc
 COPY --from=builder /usr/local/include/google /usr/local/include/google
 
 # Copy build metadata (created by CI)
-COPY .build-metadata/BUILD_TAG /etc/go-toolbox/BUILD_TAG
-COPY .build-metadata/GO_VERSION /etc/go-toolbox/GO_VERSION
-COPY .build-metadata/BUILD_NAME /etc/go-toolbox/BUILD_NAME
+COPY .build-metadata/BUILD_TAG /etc/mjolnir/BUILD_TAG
+COPY .build-metadata/GO_VERSION /etc/mjolnir/GO_VERSION
+COPY .build-metadata/BUILD_NAME /etc/mjolnir/BUILD_NAME
 
 ENV PATH="/go/bin:${PATH}"
 
 # Labels with build metadata
-LABEL org.opencontainers.image.title="go-toolbox" \
-      org.opencontainers.image.description="GitHub Actions job-container for building Go binaries (Alpine)" \
-      org.opencontainers.image.source="https://github.com/inovacc/go-toolbox" \
+LABEL org.opencontainers.image.title="mjolnir" \
+      org.opencontainers.image.description="The hammer for every build - Multi-language CI container (Alpine)" \
+      org.opencontainers.image.source="https://github.com/inovacc/mjolnir" \
       org.opencontainers.image.vendor="inovacc"
 
 # Verify tools
-CMD ["sh", "-c", "echo \"Build: $(cat /etc/go-toolbox/BUILD_TAG)\" && go version && task --version && sqlc version && goreleaser --version && protoc --version && protoc-gen-go --version && protoc-gen-go-grpc --version && node --version && pnpm --version && bun --version && python3 --version && gcc --version | head -1 && rustc --version && cargo --version"]
+CMD ["sh", "-c", "echo \"Build: $(cat /etc/mjolnir/BUILD_TAG)\" && go version && task --version && sqlc version && goreleaser --version && protoc --version && protoc-gen-go --version && protoc-gen-go-grpc --version && node --version && pnpm --version && bun --version && python3 --version && gcc --version | head -1 && rustc --version && cargo --version"]

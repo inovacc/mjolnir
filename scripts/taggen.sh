@@ -1,27 +1,35 @@
 #!/bin/bash
-# taggen.sh - Generate Docker image tags with Go version and random name
+# taggen.sh - Generate Docker image tags with mythology names
+# Theme: Mjolnir - The Hammer of the Gods
 # Usage: ./taggen.sh [-A|-D|--name|--version]
 
-ADJECTIVES=(
-    admiring agile ancient bold brave bright calm clever cool cosmic
-    daring eager elegant epic fearless fierce flying focused friendly gentle
-    gifted golden graceful happy hopeful hungry jolly keen kind laughing
-    lively lucky magical mighty modest musing nifty noble peaceful polite
-    proud quick quiet rapid relaxed sharp shiny silent sleepy smart
-    smooth snappy solid speedy stoic sunny sweet swift tender thirsty
-    trusting upbeat vibrant vigilant warm wise witty wonderful zealous zen
+FIGURES=(
+    # Norse
+    thor odin freya loki heimdall baldur tyr fenrir valkyrie frigga
+    # Greek
+    zeus athena apollo artemis hermes poseidon hades ares hera
+    # Roman
+    jupiter mars venus neptune mercury minerva diana vulcan janus
+    # Egyptian
+    ra anubis isis osiris horus thoth bastet sekhmet sobek
+    # Celtic
+    dagda morrigan lugh brigid cernunnos nuada
+    # Heroes & Titans
+    prometheus atlas achilles perseus hercules theseus odysseus
+    # Mythical Creatures
+    phoenix griffin hydra kraken chimera pegasus cerberus
 )
 
-NOUNS=(
-    albatross antelope badger bear beaver bird buffalo butterfly camel cat
-    cheetah cobra condor crane deer dolphin dragon eagle elephant falcon
-    ferret finch firefly fish flamingo fox frog gazelle giraffe goose
-    gorilla hawk hedgehog heron horse hummingbird jaguar jellyfish kangaroo koala
-    lemur leopard lion lizard lynx mammoth meerkat moose narwhal newt
-    octopus orca otter owl panda panther parrot peacock pelican penguin
-    phoenix pigeon puma rabbit raccoon raven salmon seahorse seal shark
-    sparrow spider squid stork swan tiger toucan turtle unicorn viper
-    walrus whale wolf wombat zebra
+REALMS=(
+    # Norse
+    asgard midgard valhalla bifrost yggdrasil ragnarok jotunheim niflheim
+    # Greek
+    olympus tartarus elysium styx aegis delphi arcadia
+    # Attributes
+    thunder lightning storm forge fire wisdom valor glory
+    immortal eternal divine sacred cosmic celestial ancient
+    # Elements
+    inferno tempest aurora eclipse zenith apex nova
 )
 
 # Get random element from array
@@ -30,11 +38,11 @@ random_element() {
     echo "${arr[$RANDOM % ${#arr[@]}]}"
 }
 
-# Generate random name
+# Generate random mythology name
 generate_name() {
-    local adj=$(random_element "${ADJECTIVES[@]}")
-    local noun=$(random_element "${NOUNS[@]}")
-    echo "${adj}-${noun}"
+    local figure=$(random_element "${FIGURES[@]}")
+    local realm=$(random_element "${REALMS[@]}")
+    echo "${figure}-${realm}"
 }
 
 # Get Go version from argument or default
@@ -68,22 +76,24 @@ for arg in "$@"; do
             exit 0
             ;;
         -h|--help)
+            echo "⚡ Mjolnir Tag Generator"
+            echo ""
             echo "Usage: taggen.sh [OPTIONS]"
             echo ""
             echo "Options:"
-            echo "  (no args)    Print full tag: <go-version>-<random-name>"
-            echo "  -A, --alpine Print tag with Alpine suffix: <go-version>A-<random-name>"
-            echo "  -D, --debian Print tag with Debian suffix: <go-version>D-<random-name>"
-            echo "  --name       Print only random name"
+            echo "  (no args)    Print full tag: <go-version>-<figure>-<realm>"
+            echo "  -A, --alpine Print tag with Alpine suffix: <go-version>A-<figure>-<realm>"
+            echo "  -D, --debian Print tag with Debian suffix: <go-version>D-<figure>-<realm>"
+            echo "  --name       Print only mythology name (figure-realm)"
             echo "  --version    Print only Go version"
             echo ""
             echo "Environment:"
             echo "  GO_VERSION   Override Go version (default: 1.25)"
             echo ""
             echo "Examples:"
-            echo "  taggen.sh           # 1.25-mighty-wolf"
-            echo "  taggen.sh -A        # 1.25A-mighty-wolf"
-            echo "  taggen.sh -D        # 1.25D-mighty-wolf"
+            echo "  taggen.sh           # 1.25-thor-asgard"
+            echo "  taggen.sh -A        # 1.25A-zeus-olympus"
+            echo "  taggen.sh -D        # 1.25D-odin-valhalla"
             exit 0
             ;;
     esac

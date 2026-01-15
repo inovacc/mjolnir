@@ -64,8 +64,8 @@ tasks:
       - echo "{{.TAG}}" > .build-metadata/BUILD_TAG
       - echo "{{.GO_VERSION}}" > .build-metadata/GO_VERSION
       - echo "{{.RANDOM_NAME}}" > .build-metadata/BUILD_NAME
-      - docker build -f Dockerfile.debian -t ghcr.io/inovacc/go-toolbox:{{.TAG}} -t ghcr.io/inovacc/go-toolbox:debian .
-      - echo "Built ghcr.io/inovacc/go-toolbox:{{.TAG}}"
+      - docker build -f Dockerfile.debian -t ghcr.io/inovacc/mjolnir:{{.TAG}} -t ghcr.io/inovacc/mjolnir:debian .
+      - echo "Built ghcr.io/inovacc/mjolnir:{{.TAG}}"
 
   docker:build:alpine:
     desc: Build Alpine image with generated tag
@@ -78,8 +78,8 @@ tasks:
       - echo "{{.TAG}}" > .build-metadata/BUILD_TAG
       - echo "{{.GO_VERSION}}" > .build-metadata/GO_VERSION
       - echo "{{.RANDOM_NAME}}" > .build-metadata/BUILD_NAME
-      - docker build -f Dockerfile.alpine -t ghcr.io/inovacc/go-toolbox:{{.TAG}} -t ghcr.io/inovacc/go-toolbox:alpine .
-      - echo "Built ghcr.io/inovacc/go-toolbox:{{.TAG}}"
+      - docker build -f Dockerfile.alpine -t ghcr.io/inovacc/mjolnir:{{.TAG}} -t ghcr.io/inovacc/mjolnir:alpine .
+      - echo "Built ghcr.io/inovacc/mjolnir:{{.TAG}}"
 
   docker:build:both:
     desc: Build both Alpine and Debian with same random name
@@ -94,10 +94,10 @@ tasks:
       - echo "{{.TAG_DEBIAN}}" > .build-metadata/BUILD_TAG
       - echo "{{.GO_VERSION}}" > .build-metadata/GO_VERSION
       - echo "{{.RANDOM_NAME}}" > .build-metadata/BUILD_NAME
-      - docker build -f Dockerfile.debian -t ghcr.io/inovacc/go-toolbox:{{.TAG_DEBIAN}} -t ghcr.io/inovacc/go-toolbox:debian .
+      - docker build -f Dockerfile.debian -t ghcr.io/inovacc/mjolnir:{{.TAG_DEBIAN}} -t ghcr.io/inovacc/mjolnir:debian .
       # Build Alpine
       - echo "{{.TAG_ALPINE}}" > .build-metadata/BUILD_TAG
-      - docker build -f Dockerfile.alpine -t ghcr.io/inovacc/go-toolbox:{{.TAG_ALPINE}} -t ghcr.io/inovacc/go-toolbox:alpine .
+      - docker build -f Dockerfile.alpine -t ghcr.io/inovacc/mjolnir:{{.TAG_ALPINE}} -t ghcr.io/inovacc/mjolnir:alpine .
       - echo "Built images:"
       - echo "  Debian: {{.TAG_DEBIAN}}"
       - echo "  Alpine: {{.TAG_ALPINE}}"
@@ -105,12 +105,12 @@ tasks:
   docker:test:debian:
     desc: Test Debian image
     cmds:
-      - docker run --rm ghcr.io/inovacc/go-toolbox:debian
+      - docker run --rm ghcr.io/inovacc/mjolnir:debian
 
   docker:test:alpine:
     desc: Test Alpine image
     cmds:
-      - docker run --rm ghcr.io/inovacc/go-toolbox:alpine
+      - docker run --rm ghcr.io/inovacc/mjolnir:alpine
 
   clean:
     desc: Clean build metadata

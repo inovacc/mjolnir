@@ -1,5 +1,5 @@
-# Build stage using go-toolbox
-FROM ghcr.io/inovacc/go-toolbox:latest AS builder
+# Build stage using mjolnir
+FROM ghcr.io/inovacc/mjolnir:latest AS builder
 
 ARG GITHUB_OWNER=inovacc
 ENV GITHUB_OWNER=${GITHUB_OWNER}

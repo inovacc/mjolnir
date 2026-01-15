@@ -1,17 +1,19 @@
-# Go Toolbox Builder
+# ⚡ Mjolnir
 
-[![GHCR](https://img.shields.io/badge/GHCR-ghcr.io%2Finovacc%2Fgo--toolbox-blue?logo=docker)](https://github.com/inovacc/go-toolbox/pkgs/container/go-toolbox)
-[![CI Workflow](https://github.com/inovacc/go-toolbox/actions/workflows/ci.yml/badge.svg)](https://github.com/inovacc/go-toolbox/actions/workflows/ci.yml)
-[![License](https://img.shields.io/github/license/inovacc/go-toolbox)](LICENSE)
+> **The hammer for every build**
 
-A hardened GitHub Actions job-container image for building production-grade Go binaries.
+[![GHCR](https://img.shields.io/badge/GHCR-ghcr.io%2Finovacc%2Fmjolnir-blue?logo=docker)](https://github.com/inovacc/mjolnir/pkgs/container/mjolnir)
+[![CI Workflow](https://github.com/inovacc/mjolnir/actions/workflows/ci.yml/badge.svg)](https://github.com/inovacc/mjolnir/actions/workflows/ci.yml)
+[![License](https://img.shields.io/github/license/inovacc/mjolnir)](LICENSE)
+
+A powerful multi-language build container for GitHub Actions. Forge your builds with the power of gods.
 
 ```bash
 # Debian-based (default)
-docker pull ghcr.io/inovacc/go-toolbox:latest
+docker pull ghcr.io/inovacc/mjolnir:latest
 
 # Alpine-based (smaller image)
-docker pull ghcr.io/inovacc/go-toolbox:alpine
+docker pull ghcr.io/inovacc/mjolnir:alpine
 ```
 
 ## Features
@@ -65,10 +67,10 @@ docker pull ghcr.io/inovacc/go-toolbox:alpine
 
 ## Image Tagging
 
-Images use semantic tags with Go version, flavor suffix, and random identifier:
+Images use mythology-themed tags with Go version, flavor suffix, and divine names:
 
 ```
-<go-version><flavor>-<adjective>-<animal>
+<go-version><flavor>-<figure>-<realm>
 ```
 
 ### Tag Format
@@ -77,11 +79,12 @@ Images use semantic tags with Go version, flavor suffix, and random identifier:
 |-----------|--------|--------|---------|
 | Go version | `1.25` | `1.25` | Go toolchain version |
 | Flavor | `A` | `D` | Alpine or Debian |
-| Random name | `gentle-panda` | `gentle-panda` | Build identifier |
+| Figure | `thor` | `thor` | Mythological figure |
+| Realm | `asgard` | `asgard` | Divine realm/attribute |
 
 **Examples:**
-- Alpine: `ghcr.io/inovacc/go-toolbox:1.25A-gentle-panda`
-- Debian: `ghcr.io/inovacc/go-toolbox:1.25D-gentle-panda`
+- Alpine: `ghcr.io/inovacc/mjolnir:1.25A-thor-asgard`
+- Debian: `ghcr.io/inovacc/mjolnir:1.25D-zeus-olympus`
 
 ### Available Tags
 
@@ -90,18 +93,18 @@ Images use semantic tags with Go version, flavor suffix, and random identifier:
 | `latest` | Latest Debian build |
 | `debian` | Latest Debian build |
 | `alpine` | Latest Alpine build |
-| `1.25D-<name>` | Specific Debian build |
-| `1.25A-<name>` | Specific Alpine build |
+| `1.25D-<figure>-<realm>` | Specific Debian build |
+| `1.25A-<figure>-<realm>` | Specific Alpine build |
 | `x.y.z` | Semantic version release |
 
 ### Local Tag Generation
 
 ```bash
 # Generate tags
-task taggen              # Full Debian tag: 1.25D-sharp-otter
-task taggen:alpine       # Full Alpine tag: 1.25A-sharp-otter
-task taggen:debian       # Full Debian tag: 1.25D-sharp-otter
-task taggen:name         # Random name only: sharp-otter
+task taggen              # Full Debian tag: 1.25D-odin-valhalla
+task taggen:alpine       # Full Alpine tag: 1.25A-odin-valhalla
+task taggen:debian       # Full Debian tag: 1.25D-odin-valhalla
+task taggen:name         # Random name only: odin-valhalla
 
 # Build images
 task docker:build:debian  # Build Debian image
@@ -118,7 +121,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/inovacc/go-toolbox:latest
+      image: ghcr.io/inovacc/mjolnir:latest
     steps:
       - uses: actions/checkout@v4
       - run: task build:prod
@@ -131,7 +134,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/inovacc/go-toolbox:alpine
+      image: ghcr.io/inovacc/mjolnir:alpine
     steps:
       - uses: actions/checkout@v4
       - run: task build:prod
@@ -144,7 +147,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/inovacc/go-toolbox:latest
+      image: ghcr.io/inovacc/mjolnir:latest
       env:
         GOPRIVATE: github.com/your-org/*
         GONOSUMDB: github.com/your-org/*
@@ -188,7 +191,7 @@ taggen → lint ─────────────────────�
 
 | Job | Description |
 |-----|-------------|
-| `taggen` | Generate consistent random name for both builds |
+| `taggen` | Generate consistent mythology name for both builds |
 | `lint` | Hadolint Dockerfile best practices |
 | `build-debian` | Build Debian image and verify tools |
 | `build-alpine` | Build Alpine image and verify tools |
@@ -223,6 +226,17 @@ tasks:
     cmds:
       - goreleaser release --clean
 ```
+
+## Mythology
+
+Mjolnir (pronounced "mee-ol-neer") is Thor's hammer in Norse mythology - a weapon of immense power forged by dwarven blacksmiths. Like the legendary hammer, this container forges your builds with divine precision.
+
+Image tags draw from world mythology:
+- **Norse**: Thor, Odin, Freya, Asgard, Valhalla
+- **Greek**: Zeus, Athena, Apollo, Olympus
+- **Roman**: Jupiter, Mars, Venus
+- **Egyptian**: Ra, Anubis, Isis
+- **Celtic**: Dagda, Morrigan, Lugh
 
 ## License
 
