@@ -50,9 +50,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
  && curl -fsSL https://bun.sh/install | bash \
  && mv /root/.bun/bin/bun /usr/local/bin/bun \
  && rm -rf /root/.bun \
- && curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y \
+ && curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable \
+ && /root/.cargo/bin/rustup default stable \
  && mv /root/.cargo/bin/* /usr/local/bin/ \
- && rm -rf /root/.cargo /root/.rustup
+ && mv /root/.rustup /usr/local/rustup
+
+ENV RUSTUP_HOME=/usr/local/rustup
 
 # Copy compiled tools from builder
 COPY --from=builder /go/bin/* /go/bin/
