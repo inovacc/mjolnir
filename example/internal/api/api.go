@@ -80,7 +80,7 @@ func healthHandler(w http.ResponseWriter, _ *http.Request) {
 
 func rootHandler(w http.ResponseWriter, _ *http.Request) {
 	resp := MessageResponse{
-		Message: "Go Toolbox Example API",
+		Message: "Mjolnir Example API",
 	}
 
 	slog.Info("root handler")

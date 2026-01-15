@@ -1,4 +1,4 @@
-# Go Toolbox Example API
+# Mjolnir Example API
 
 A minimal Go web API demonstrating how to use [mjolnir](https://github.com/inovacc/mjolnir) for building production-grade Docker images.
 
