@@ -7,59 +7,106 @@
 A hardened GitHub Actions job-container image for building production-grade Go binaries.
 
 ```bash
+# Debian-based (default)
 docker pull ghcr.io/inovacc/go-toolbox:latest
+
+# Alpine-based (smaller image)
+docker pull ghcr.io/inovacc/go-toolbox:alpine
 ```
 
 ## Features
 
+- **Multi-language Support** - Go, Node.js, Python, Rust toolchains
 - **GoReleaser** - Build static Linux Go binaries
 - **Task** - Task runner for build automation
 - **Protobuf** - Protocol Buffer compiler with Go plugins
 - **SQLC** - Type-safe SQL code generator
 - **Security** - Hadolint linting + Trivy vulnerability scanning
+- **Scheduled Builds** - Automatic bi-weekly rebuilds for security updates
+
+## Image Flavors
+
+| Flavor | Base | Tag | Size |
+|--------|------|-----|------|
+| Debian | `golang:1.25` | `latest`, `debian` | ~1.6GB |
+| Alpine | `golang:1.25-alpine` | `alpine` | ~700MB |
 
 ## Included Tools
+
+### Go Ecosystem
 
 | Tool | Version | Purpose |
 |------|---------|---------|
 | Go | 1.25 | Go toolchain |
-| Task | 3.39.2 | Task runner |
-| GoReleaser | 2.6.1 | Release automation |
-| SQLC | 1.27.0 | SQL code generator |
+| Task | latest | Task runner |
+| GoReleaser | latest | Release automation |
+| SQLC | latest | SQL code generator |
 | Protoc | 33.4 | Protocol Buffer compiler |
-| protoc-gen-go | 1.28.0 | Go protobuf generator |
-| protoc-gen-go-grpc | 1.2.0 | Go gRPC generator |
+| protoc-gen-go | latest | Go protobuf generator |
+| protoc-gen-go-grpc | latest | Go gRPC generator |
+
+### Node.js Ecosystem
+
+| Tool | Version | Purpose |
+|------|---------|---------|
+| Node.js | OS package | JavaScript runtime |
+| npm | OS package | Package manager |
+| pnpm | latest | Fast package manager |
+| bun | latest | Fast JavaScript runtime |
+
+### Other Languages
+
+| Tool | Version | Purpose |
+|------|---------|---------|
+| Python 3 | OS package | Python runtime |
+| GCC | OS package | C/C++ compiler |
+| Rust (rustc) | stable | Rust compiler |
+| Cargo | stable | Rust package manager |
 
 ## Image Tagging
 
-Generate semantic image tags with Go version and random identifier:
+Images use semantic tags with Go version, flavor suffix, and random identifier:
 
-```bash
-# Generate tag: <go-version>-<adjective>-<animal>
-task taggen
-# Output: 1.25-sharp-otter
-
-# Build with generated tag
-task docker:build
-# Output: ghcr.io/inovacc/go-toolbox:1.25-sharp-otter
+```
+<go-version><flavor>-<adjective>-<animal>
 ```
 
 ### Tag Format
 
-| Component | Example | Purpose |
-|-----------|---------|---------|
-| Go version | `1.25` | Identify Go toolchain version |
-| Random name | `sharp-otter` | Identify build changes |
+| Component | Alpine | Debian | Purpose |
+|-----------|--------|--------|---------|
+| Go version | `1.25` | `1.25` | Go toolchain version |
+| Flavor | `A` | `D` | Alpine or Debian |
+| Random name | `proud-panther` | `proud-panther` | Build identifier |
 
-### Available Tasks
+**Examples:**
+- Alpine: `ghcr.io/inovacc/go-toolbox:1.25A-proud-panther`
+- Debian: `ghcr.io/inovacc/go-toolbox:1.25D-proud-panther`
+
+### Available Tags
+
+| Tag | Description |
+|-----|-------------|
+| `latest` | Latest Debian build |
+| `debian` | Latest Debian build |
+| `alpine` | Latest Alpine build |
+| `1.25D-<name>` | Specific Debian build |
+| `1.25A-<name>` | Specific Alpine build |
+| `x.y.z` | Semantic version release |
+
+### Local Tag Generation
 
 ```bash
-task taggen           # Full tag: 1.25-sharp-otter
-task taggen:version   # Go version only: 1.25
-task taggen:name      # Random name only: sharp-otter
-task docker:build     # Build with generated tag
-task docker:build:local  # Build with local tag
-task docker:test      # Test image tools
+# Generate tags
+task taggen              # Full Debian tag: 1.25D-sharp-otter
+task taggen:alpine       # Full Alpine tag: 1.25A-sharp-otter
+task taggen:debian       # Full Debian tag: 1.25D-sharp-otter
+task taggen:name         # Random name only: sharp-otter
+
+# Build images
+task docker:build:debian  # Build Debian image
+task docker:build:alpine  # Build Alpine image
+task docker:build:both    # Build both with same name
 ```
 
 ## Quick Start
@@ -72,6 +119,19 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/inovacc/go-toolbox:latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: task build:prod
+```
+
+### Use Alpine for Faster Pulls
+
+```yaml
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/inovacc/go-toolbox:alpine
     steps:
       - uses: actions/checkout@v4
       - run: task build:prod
@@ -121,15 +181,26 @@ ENTRYPOINT ["/app"]
 ## CI Pipeline
 
 ```
-lint → build → security → release
+taggen → lint ──────────────────────┐
+           ├── build-debian ────────┼── security → release
+           └── build-alpine ────────┘
 ```
 
 | Job | Description |
 |-----|-------------|
+| `taggen` | Generate consistent random name for both builds |
 | `lint` | Hadolint Dockerfile best practices |
-| `build` | Build image and verify all tools |
+| `build-debian` | Build Debian image and verify tools |
+| `build-alpine` | Build Alpine image and verify tools |
 | `security` | Trivy vulnerability scan (CRITICAL, HIGH) |
 | `release` | Push to GHCR (on tags only) |
+
+### Scheduled Builds
+
+Images are automatically rebuilt on the 1st and 15th of each month to include:
+- Latest Go tool versions
+- Security patches from base images
+- Updated dependencies
 
 ## Sample Taskfile
 
