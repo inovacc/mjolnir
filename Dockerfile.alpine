@@ -43,8 +43,9 @@ WORKDIR /workspace
 
 # Install runtime dependencies and additional tools
 # hadolint ignore=DL3018,DL3016,DL4006
+ARG DOCKER_VERSION=27.5.1
 RUN apk add --no-cache git ca-certificates bash make curl unzip jq yq \
-    nodejs npm python3 py3-pip gcc musl-dev docker-cli \
+    nodejs npm python3 py3-pip gcc musl-dev \
  && npm install -g pnpm typescript@5.9.3 \
  && curl -fsSL https://bun.sh/install | bash \
  && mv /root/.bun/bin/bun /usr/local/bin/bun \
@@ -53,6 +54,9 @@ RUN apk add --no-cache git ca-certificates bash make curl unzip jq yq \
  && /root/.cargo/bin/rustup default stable \
  && mv /root/.cargo/bin/* /usr/local/bin/ \
  && mv /root/.rustup /usr/local/rustup \
+ && curl -fsSL "https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKER_VERSION}.tgz" | tar xz -C /tmp \
+ && mv /tmp/docker/docker /usr/local/bin/docker \
+ && rm -rf /tmp/docker \
  && curl -fsSL -o /usr/local/bin/hadolint https://github.com/hadolint/hadolint/releases/latest/download/hadolint-Linux-x86_64 \
  && chmod +x /usr/local/bin/hadolint
 
@@ -63,10 +67,18 @@ COPY --from=builder /go/bin/* /go/bin/
 COPY --from=builder /usr/local/bin/protoc /usr/local/bin/protoc
 COPY --from=builder /usr/local/include/google /usr/local/include/google
 
-# Copy build metadata (created by CI)
-COPY .build-metadata/BUILD_TAG /etc/mjolnir/BUILD_TAG
-COPY .build-metadata/GO_VERSION /etc/mjolnir/GO_VERSION
-COPY .build-metadata/BUILD_NAME /etc/mjolnir/BUILD_NAME
+# Generate build metadata
+ARG BUILD_VERSION=dev
+RUN mkdir -p /etc/mjolnir && \
+    FIGURES=(thor odin freya loki heimdall zeus athena apollo mars venus ra anubis phoenix griffin) && \
+    REALMS=(asgard valhalla olympus thunder storm forge fire wisdom valor eternal divine) && \
+    FIGURE=${FIGURES[$RANDOM % ${#FIGURES[@]}]} && \
+    REALM=${REALMS[$RANDOM % ${#REALMS[@]}]} && \
+    GO_VER=$(go version | awk '{print $3}' | sed 's/go//') && \
+    echo "${GO_VER}A-${FIGURE}-${REALM}" > /etc/mjolnir/BUILD_TAG && \
+    echo "${GO_VER}" > /etc/mjolnir/GO_VERSION && \
+    echo "${FIGURE}-${REALM}" > /etc/mjolnir/BUILD_NAME && \
+    echo "${BUILD_VERSION}" > /etc/mjolnir/BUILD_VERSION
 
 ENV PATH="/go/bin:${PATH}"
 
