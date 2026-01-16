@@ -42,8 +42,8 @@ ENV https_proxy=${HTTPS_PROXY}
 WORKDIR /workspace
 
 # Install runtime dependencies and additional tools
-# hadolint ignore=DL3018,DL3016,DL4006
 ARG DOCKER_VERSION=27.5.1
+# hadolint ignore=DL3018,DL3016,DL4006
 RUN apk add --no-cache git ca-certificates bash make curl unzip jq yq \
     nodejs npm python3 py3-pip gcc musl-dev \
  && npm install -g pnpm typescript@5.9.3 \
