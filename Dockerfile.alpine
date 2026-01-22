@@ -29,9 +29,8 @@ RUN go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest \
 
 # Build gitleaks from source
 RUN git clone --depth 1 https://github.com/gitleaks/gitleaks.git /tmp/gitleaks \
- && cd /tmp/gitleaks \
- && make build \
- && mv gitleaks /go/bin/gitleaks \
+ && make -C /tmp/gitleaks build \
+ && mv /tmp/gitleaks/gitleaks /go/bin/gitleaks \
  && rm -rf /tmp/gitleaks
 
 # Download and extract protoc
