@@ -20,9 +20,8 @@ Repository: `ghcr.io/inovacc/mjolnir`
 ## Tagging Scheme
 
 ```
-ghcr.io/inovacc/mjolnir:1.6.8          # Default (Debian)
-ghcr.io/inovacc/mjolnir:1.6.8-debian   # Explicit Debian
-ghcr.io/inovacc/mjolnir:1.6.8-alpine   # Alpine variant
+ghcr.io/inovacc/mjolnir:1.6.9          # Default (Debian)
+ghcr.io/inovacc/mjolnir:1.6.9-alpine   # Alpine variant
 ghcr.io/inovacc/mjolnir:latest         # Latest Debian
 ghcr.io/inovacc/mjolnir:latest-alpine  # Latest Alpine
 ```
@@ -55,6 +54,8 @@ ghcr.io/inovacc/mjolnir:latest-alpine  # Latest Alpine
 | GCC | C compiler |
 | GoReleaser | Go release automation |
 | tsc | TypeScript compiler |
+| air | Go live reload for development |
+| xc | Task runner (Markdown-based) |
 
 ### Code Generation
 | Tool | Description |
@@ -63,6 +64,14 @@ ghcr.io/inovacc/mjolnir:latest-alpine  # Latest Alpine
 | protoc | Protocol Buffer compiler |
 | protoc-gen-go | Go protobuf generator |
 | protoc-gen-go-grpc | Go gRPC generator |
+| mockgen | Go mock generator |
+
+### Security & Signing
+| Tool | Description |
+|------|-------------|
+| gitleaks | Secret detection in git repos |
+| cosign | Container signing (Sigstore) |
+| syft | SBOM generator |
 
 ### Containers & Linting
 | Tool | Description |
@@ -83,28 +92,30 @@ ghcr.io/inovacc/mjolnir:latest-alpine  # Latest Alpine
 | curl | HTTP client |
 | unzip | Archive extraction |
 | bash | Shell |
+| glix | Go module manager |
 
 ## Build Metadata
 
 Each image generates mythology-themed build metadata at `/etc/mjolnir/`:
 
 ```
-/etc/mjolnir/BUILD_TAG      # e.g., "1.25D-thor-asgard"
+/etc/mjolnir/BUILD_TAG      # e.g., "1.25.6D-thor-asgard"
 /etc/mjolnir/BUILD_NAME     # e.g., "thor-asgard"
-/etc/mjolnir/GO_VERSION     # e.g., "1.25"
-/etc/mjolnir/BUILD_VERSION  # e.g., "1.6.8"
+/etc/mjolnir/GO_VERSION     # e.g., "1.25.6"
+/etc/mjolnir/BUILD_VERSION  # e.g., "1.6.9"
 ```
 
 ## CI/CD Pipeline
 
 ### Workflow Files
-- `.github/workflows/ci.yml` - Main CI (lint → build → security → release)
+- `.github/workflows/ci.yml` - Main CI (lint → build-and-push)
 - `.github/workflows/scheduled-build.yml` - Bi-weekly rebuilds
 
 ### CI Flow
 ```
-lint → build-debian ─┬─→ security → release
-    └→ build-alpine ─┘
+lint → build-and-push (matrix: debian, alpine)
+              ↓
+        build → push → scan
 ```
 
 ### Triggers
@@ -148,12 +159,12 @@ jobs:
 ## Release Process
 
 ```bash
-git tag v1.6.9
-git push origin v1.6.9
+git tag v1.6.10
+git push origin v1.6.10
 ```
 
 This triggers the CI workflow which:
 1. Lints Dockerfiles
-2. Builds both Debian and Alpine images
-3. Runs security scan (Trivy)
-4. Pushes to GHCR with version tags
+2. Builds both Debian and Alpine images (in parallel)
+3. Pushes to GHCR with version tags
+4. Runs security scan (Trivy)
