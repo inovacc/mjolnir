@@ -74,7 +74,7 @@ RUN BUF_VERSION=$(curl -sL https://api.github.com/repos/bufbuild/buf/releases/la
  && chmod +x /go/bin/buf
 
 # Install Node.js tools, Bun, Rust, Docker, and hadolint
-# hadolint ignore=DL4006
+# hadolint ignore=DL3016,DL4006
 RUN npm install -g pnpm typescript@5.9.3 \
  && curl -fsSL https://bun.sh/install | bash \
  && mv /root/.bun/bin/bun /usr/local/bin/bun \
