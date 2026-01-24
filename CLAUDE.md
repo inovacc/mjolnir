@@ -70,6 +70,7 @@ ghcr.io/inovacc/mjolnir:latest-alpine  # Latest Alpine
 | Tool | Description |
 |------|-------------|
 | gitleaks | Secret detection in git repos |
+| govulncheck | Go vulnerability scanner |
 | cosign | Container signing (Sigstore) |
 | syft | SBOM generator |
 

@@ -97,6 +97,7 @@ cat >> "$OUTPUT_FILE" << 'EOF'
 EOF
 
 printf "│ %-16s │ %-56s │\n" "gitleaks" "$(gitleaks version)" >> "$OUTPUT_FILE"
+printf "│ %-16s │ %-56s │\n" "govulncheck" "$(govulncheck -version 2>&1 | head -1 | awk '{print $NF}')" >> "$OUTPUT_FILE"
 printf "│ %-16s │ %-56s │\n" "cosign" "$(cosign version 2>&1 | grep GitVersion | awk '{print $2}')" >> "$OUTPUT_FILE"
 printf "│ %-16s │ %-56s │\n" "syft" "$(syft --version 2>&1 | sed 's/syft //')" >> "$OUTPUT_FILE"
 
