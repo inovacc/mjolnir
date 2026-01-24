@@ -20,10 +20,10 @@ Repository: `ghcr.io/inovacc/mjolnir`
 ## Tagging Scheme
 
 ```
-ghcr.io/inovacc/mjolnir:1.9.0          # Default (Debian)
-ghcr.io/inovacc/mjolnir:1.9.0-alpine   # Alpine variant
-ghcr.io/inovacc/mjolnir:latest         # Latest Debian
-ghcr.io/inovacc/mjolnir:latest-alpine  # Latest Alpine
+ghcr.io/inovacc/mjolnir:1.10.0          # Default (Debian)
+ghcr.io/inovacc/mjolnir:1.10.0-alpine   # Alpine variant
+ghcr.io/inovacc/mjolnir:latest          # Latest Debian
+ghcr.io/inovacc/mjolnir:latest-alpine   # Latest Alpine
 ```
 
 ## Included Tools
@@ -104,7 +104,7 @@ Each image generates mythology-themed build metadata at `/etc/mjolnir/`:
 /etc/mjolnir/BUILD_TAG      # e.g., "1.25.6D-thor-asgard"
 /etc/mjolnir/BUILD_NAME     # e.g., "thor-asgard"
 /etc/mjolnir/GO_VERSION     # e.g., "1.25.6"
-/etc/mjolnir/BUILD_VERSION  # e.g., "1.9.0"
+/etc/mjolnir/BUILD_VERSION  # e.g., "1.10.0"
 /etc/mjolnir/TOOLS_TABLE    # Pre-generated ASCII table of all tools
 ```
 
@@ -165,8 +165,8 @@ jobs:
 ## Release Process
 
 ```bash
-git tag v1.9.0
-git push origin v1.9.0
+git tag v1.10.0
+git push origin v1.10.0
 ```
 
 This triggers the CI workflow which:
