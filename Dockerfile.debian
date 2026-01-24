@@ -8,12 +8,11 @@ ARG HTTPS_PROXY=
 ENV http_proxy=${HTTP_PROXY}
 ENV https_proxy=${HTTPS_PROXY}
 
-ARG PROTOC_VERSION=33.4
-
 # Install Go tools
 RUN go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest \
  && go install github.com/go-task/task/v3/cmd/task@latest \
  && go install github.com/goreleaser/goreleaser/v2@latest \
+ && go install github.com/bufbuild/buf/cmd/buf@latest \
  && go install google.golang.org/protobuf/cmd/protoc-gen-go@latest \
  && go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest \
  && go install go.uber.org/mock/mockgen@latest \
@@ -21,6 +20,7 @@ RUN go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest \
  && go install github.com/air-verse/air@latest \
  && go install github.com/joerdav/xc/cmd/xc@latest \
  && go install github.com/sigstore/cosign/v2/cmd/cosign@latest \
+ && go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest \
  && go install github.com/inovacc/glix@latest
 
 # Build gitleaks from source
@@ -28,16 +28,6 @@ RUN git clone --depth 1 https://github.com/gitleaks/gitleaks.git /tmp/gitleaks \
  && make -C /tmp/gitleaks build \
  && mv /tmp/gitleaks/gitleaks /go/bin/gitleaks \
  && rm -rf /tmp/gitleaks
-
-# Download and extract protoc
-# hadolint ignore=DL3008
-RUN apt-get update && apt-get install -y --no-install-recommends curl unzip \
- && PROTOC_ZIP="protoc-${PROTOC_VERSION}-linux-x86_64.zip" \
- && curl -fL -o "${PROTOC_ZIP}" "https://github.com/protocolbuffers/protobuf/releases/download/v${PROTOC_VERSION}/${PROTOC_ZIP}" \
- && unzip -o "${PROTOC_ZIP}" -d /usr/local bin/protoc \
- && unzip -o "${PROTOC_ZIP}" -d /usr/local 'include/*' \
- && rm -f "${PROTOC_ZIP}" \
- && rm -rf /var/lib/apt/lists/*
 
 # ============================================
 # Stage 2: Final - minimal runtime image
@@ -80,8 +70,6 @@ ENV RUSTUP_HOME=/usr/local/rustup
 
 # Copy compiled tools from builder
 COPY --from=builder /go/bin/* /go/bin/
-COPY --from=builder /usr/local/bin/protoc /usr/local/bin/protoc
-COPY --from=builder /usr/local/include/google /usr/local/include/google
 
 # Copy tools table generator script
 COPY scripts/generate-tools-table.sh /usr/local/bin/generate-tools-table.sh

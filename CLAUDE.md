@@ -61,7 +61,7 @@ ghcr.io/inovacc/mjolnir:latest-alpine  # Latest Alpine
 | Tool | Description |
 |------|-------------|
 | sqlc | Type-safe SQL code generator |
-| protoc | Protocol Buffer compiler |
+| buf | Protocol Buffer CLI tool |
 | protoc-gen-go | Go protobuf generator |
 | protoc-gen-go-grpc | Go gRPC generator |
 | mockgen | Go mock generator |
@@ -78,6 +78,7 @@ ghcr.io/inovacc/mjolnir:latest-alpine  # Latest Alpine
 |------|-------------|
 | Docker CLI | Docker command-line tool |
 | hadolint | Dockerfile linter |
+| golangci-lint | Go linters aggregator |
 
 ### Data Processing
 | Tool | Description |

@@ -83,7 +83,7 @@ cat >> "$OUTPUT_FILE" << 'EOF'
 EOF
 
 printf "│ %-16s │ %-56s │\n" "sqlc" "$(sqlc version)" >> "$OUTPUT_FILE"
-printf "│ %-16s │ %-56s │\n" "protoc" "$(protoc --version | awk '{print $2}')" >> "$OUTPUT_FILE"
+printf "│ %-16s │ %-56s │\n" "buf" "$(buf --version)" >> "$OUTPUT_FILE"
 printf "│ %-16s │ %-56s │\n" "protoc-gen-go" "$(protoc-gen-go --version | awk '{print $2}')" >> "$OUTPUT_FILE"
 printf "│ %-16s │ %-56s │\n" "protoc-go-grpc" "$(protoc-gen-go-grpc --version | awk '{print $2}')" >> "$OUTPUT_FILE"
 printf "│ %-16s │ %-56s │\n" "mockgen" "$(mockgen --version | awk '{print $NF}')" >> "$OUTPUT_FILE"
@@ -110,6 +110,7 @@ EOF
 
 printf "│ %-16s │ %-56s │\n" "Docker CLI" "$(docker --version | awk '{print $3}' | tr -d ',')" >> "$OUTPUT_FILE"
 printf "│ %-16s │ %-56s │\n" "hadolint" "$(hadolint --version | awk '{print $4}')" >> "$OUTPUT_FILE"
+printf "│ %-16s │ %-56s │\n" "golangci-lint" "$(golangci-lint --version | awk '{print $4}')" >> "$OUTPUT_FILE"
 
 cat >> "$OUTPUT_FILE" << 'EOF'
 └──────────────────┴──────────────────────────────────────────────────────────┘

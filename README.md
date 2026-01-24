@@ -21,7 +21,7 @@ docker pull ghcr.io/inovacc/mjolnir:alpine
 - **Multi-language Support** - Go, Node.js, Python, Rust toolchains
 - **GoReleaser** - Build static Linux Go binaries
 - **Task** - Task runner for build automation
-- **Protobuf** - Protocol Buffer compiler with Go plugins
+- **Buf** - Protocol Buffer CLI with Go plugins
 - **SQLC** - Type-safe SQL code generator
 - **Security** - Hadolint linting + Trivy vulnerability scanning
 - **Scheduled Builds** - Automatic bi-weekly rebuilds for security updates
@@ -43,9 +43,10 @@ docker pull ghcr.io/inovacc/mjolnir:alpine
 | Task | latest | Task runner |
 | GoReleaser | latest | Release automation |
 | SQLC | latest | SQL code generator |
-| Protoc | 33.4 | Protocol Buffer compiler |
+| Buf | latest | Protocol Buffer CLI |
 | protoc-gen-go | latest | Go protobuf generator |
 | protoc-gen-go-grpc | latest | Go gRPC generator |
+| golangci-lint | latest | Go linters aggregator |
 
 ### Node.js Ecosystem
 
