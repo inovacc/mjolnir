@@ -75,7 +75,7 @@ RUN BUF_VERSION=$(curl -sL https://api.github.com/repos/bufbuild/buf/releases/la
 
 # Install Node.js tools, Bun, Rust, Docker, hadolint, and yq
 # hadolint ignore=DL3016,DL4006
-RUN corepack enable && corepack prepare pnpm@latest --activate \
+RUN npm install -g corepack && corepack enable && corepack prepare pnpm@latest --activate \
  && npm install -g typescript@5.9.3 \
  && curl -fsSL https://bun.sh/install | bash \
  && mv /root/.bun/bin/bun /usr/local/bin/bun \
