@@ -98,9 +98,9 @@ tasks:
       # Build Alpine
       - echo "{{.TAG_ALPINE}}" > .build-metadata/BUILD_TAG
       - docker build -f Dockerfile.alpine -t ghcr.io/inovacc/mjolnir:{{.TAG_ALPINE}} -t ghcr.io/inovacc/mjolnir:alpine .
-      - echo "Built images:"
-      - echo "  Debian: {{.TAG_DEBIAN}}"
-      - echo "  Alpine: {{.TAG_ALPINE}}"
+      - 'echo "Built images:"'
+      - 'echo "  Debian: {{.TAG_DEBIAN}}"'
+      - 'echo "  Alpine: {{.TAG_ALPINE}}"'
 
   docker:test:debian:
     desc: Test Debian image

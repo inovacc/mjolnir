@@ -17,6 +17,7 @@ jobs:
     permissions:
       contents: read
       packages: write
+      security-events: write
     steps:
       - uses: actions/checkout@v4
 
@@ -43,11 +44,29 @@ jobs:
       - name: Verify Debian image
         run: docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
 
+      - name: Scan Debian image
+        uses: aquasecurity/trivy-action@v0.35.0
+        with:
+          image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          format: 'sarif'
+          output: 'trivy-debian.sarif'
+          severity: 'CRITICAL,HIGH'
+        continue-on-error: true
+
+      - name: Upload Debian scan results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-debian.sarif'
+          category: scheduled-debian
+        continue-on-error: true
+
   build-and-push-alpine:
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
+      security-events: write
     steps:
       - uses: actions/checkout@v4
 
@@ -73,3 +92,20 @@ jobs:
 
       - name: Verify Alpine image
         run: docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest-alpine
+
+      - name: Scan Alpine image
+        uses: aquasecurity/trivy-action@v0.35.0
+        with:
+          image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest-alpine
+          format: 'sarif'
+          output: 'trivy-alpine.sarif'
+          severity: 'CRITICAL,HIGH'
+        continue-on-error: true
+
+      - name: Upload Alpine scan results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-alpine.sarif'
+          category: scheduled-alpine
+        continue-on-error: true

@@ -134,7 +134,7 @@ EOF
 
 printf "│ %-16s │ %-56s │\n" "git" "$(git --version | awk '{print $3}')" >> "$OUTPUT_FILE"
 printf "│ %-16s │ %-56s │\n" "curl" "$(curl --version | head -1 | awk '{print $2}')" >> "$OUTPUT_FILE"
-printf "│ %-16s │ %-56s │\n" "glix" "$(which glix >/dev/null 2>&1 && echo 'installed' || echo 'not found')" >> "$OUTPUT_FILE"
+printf "│ %-16s │ %-56s │\n" "glix" "$(glix version 2>/dev/null || glix --version 2>/dev/null || (which glix >/dev/null 2>&1 && echo 'installed' || echo 'not found'))" >> "$OUTPUT_FILE"
 
 cat >> "$OUTPUT_FILE" << 'EOF'
 └──────────────────┴──────────────────────────────────────────────────────────┘

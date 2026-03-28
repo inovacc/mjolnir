@@ -68,7 +68,8 @@ docker pull ghcr.io/inovacc/mjolnir:alpine
 |------|---------|---------|
 | Node.js | OS package | JavaScript runtime |
 | npm | OS package | Package manager |
-| pnpm | latest | Fast package manager |
+| pnpm | latest | Fast package manager (via corepack) |
+| TypeScript (tsc) | 5.9.3 | TypeScript compiler |
 | bun | latest | Fast JavaScript runtime |
 
 ### Other Languages
@@ -76,9 +77,32 @@ docker pull ghcr.io/inovacc/mjolnir:alpine
 | Tool | Version | Purpose |
 |------|---------|---------|
 | Python 3 | OS package | Python runtime |
-| GCC | OS package | C/C++ compiler |
 | Rust (rustc) | stable | Rust compiler |
 | Cargo | stable | Rust package manager |
+
+### Containers & Linting
+
+| Tool | Version | Purpose |
+|------|---------|---------|
+| Docker CLI | 27.5.1 | Docker command-line tool |
+| hadolint | latest | Dockerfile linter |
+
+### Data Processing
+
+| Tool | Version | Purpose |
+|------|---------|---------|
+| jq | OS package | JSON processor |
+| yq | latest | YAML processor (mikefarah/yq) |
+
+### Utilities
+
+| Tool | Version | Purpose |
+|------|---------|---------|
+| git | OS package | Version control |
+| curl | OS package | HTTP client |
+| Make | OS package | Build automation |
+| GCC | OS package | C/C++ compiler |
+| glix | latest | Go module manager |
 
 ## Image Tagging
 
@@ -183,7 +207,7 @@ jobs:
 After building your Go binary, create a minimal production image:
 
 ```dockerfile
-FROM gcr.io/distroless/static-debian13:nonroot
+FROM gcr.io/distroless/static-debian12:nonroot
 ARG BIN_PATH=dist/myapp
 COPY ${BIN_PATH} /app
 USER nonroot:nonroot
@@ -219,6 +243,7 @@ Images are automatically rebuilt on the 1st and 15th of each month to include:
 - Latest Go tool versions
 - Security patches from base images
 - Updated dependencies
+- Trivy vulnerability scanning (CRITICAL, HIGH) with SARIF upload
 
 ## Sample Taskfile
 

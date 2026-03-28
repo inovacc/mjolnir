@@ -46,3 +46,6 @@ tmpclaude-*
 
 # Build metadata
 .build-metadata/
+
+# Ephemeral scripts
+.scripts/

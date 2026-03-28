@@ -36,7 +36,7 @@ WORKDIR /workspace
 # Install runtime dependencies (coreutils needed for install scripts)
 ARG DOCKER_VERSION=27.5.1
 # hadolint ignore=DL3018,DL3016,DL4006
-RUN apk add --no-cache git ca-certificates bash make curl unzip jq yq \
+RUN apk add --no-cache git ca-certificates bash make curl unzip jq \
     nodejs npm python3 py3-pip gcc musl-dev coreutils
 
 # Download pre-built binaries (heavy tools)
@@ -73,9 +73,10 @@ RUN BUF_VERSION=$(curl -sL https://api.github.com/repos/bufbuild/buf/releases/la
  && curl -sSfL -o /go/bin/buf "https://github.com/bufbuild/buf/releases/download/${BUF_VERSION}/buf-Linux-x86_64" \
  && chmod +x /go/bin/buf
 
-# Install Node.js tools, Bun, Rust, Docker, and hadolint
+# Install Node.js tools, Bun, Rust, Docker, hadolint, and yq
 # hadolint ignore=DL3016,DL4006
-RUN npm install -g pnpm typescript@5.9.3 \
+RUN corepack enable && corepack prepare pnpm@latest --activate \
+ && npm install -g typescript@5.9.3 \
  && curl -fsSL https://bun.sh/install | bash \
  && mv /root/.bun/bin/bun /usr/local/bin/bun \
  && rm -rf /root/.bun \
@@ -87,7 +88,9 @@ RUN npm install -g pnpm typescript@5.9.3 \
  && mv /tmp/docker/docker /usr/local/bin/docker \
  && rm -rf /tmp/docker \
  && curl -fsSL -o /usr/local/bin/hadolint https://github.com/hadolint/hadolint/releases/latest/download/hadolint-Linux-x86_64 \
- && chmod +x /usr/local/bin/hadolint
+ && chmod +x /usr/local/bin/hadolint \
+ && curl -fsSL -o /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 \
+ && chmod +x /usr/local/bin/yq
 
 ENV RUSTUP_HOME=/usr/local/rustup
 

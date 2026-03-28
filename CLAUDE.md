@@ -20,8 +20,8 @@ Repository: `ghcr.io/inovacc/mjolnir`
 ## Tagging Scheme
 
 ```
-ghcr.io/inovacc/mjolnir:1.10.0          # Default (Debian)
-ghcr.io/inovacc/mjolnir:1.10.0-alpine   # Alpine variant
+ghcr.io/inovacc/mjolnir:1.11.0          # Default (Debian)
+ghcr.io/inovacc/mjolnir:1.11.0-alpine   # Alpine variant
 ghcr.io/inovacc/mjolnir:latest          # Latest Debian
 ghcr.io/inovacc/mjolnir:latest-alpine   # Latest Alpine
 ```
@@ -104,7 +104,7 @@ Each image generates mythology-themed build metadata at `/etc/mjolnir/`:
 /etc/mjolnir/BUILD_TAG      # e.g., "1.25.6D-thor-asgard"
 /etc/mjolnir/BUILD_NAME     # e.g., "thor-asgard"
 /etc/mjolnir/GO_VERSION     # e.g., "1.25.6"
-/etc/mjolnir/BUILD_VERSION  # e.g., "1.10.0"
+/etc/mjolnir/BUILD_VERSION  # e.g., "1.11.0"
 /etc/mjolnir/TOOLS_TABLE    # Pre-generated ASCII table of all tools
 ```
 
@@ -120,13 +120,13 @@ Running the container displays a formatted tools table (generated at build time 
 ```
 lint → build-and-push (matrix: debian, alpine)
               ↓
-        build → push → scan
+        build → push → scan (Trivy v0.35.0)
 ```
 
 ### Triggers
 - **Tags (`v*`)**: Full pipeline with release to GHCR
 - **Pull Requests**: Lint, build, security scan (no push)
-- **Scheduled**: Bi-weekly rebuilds (1st and 15th)
+- **Scheduled**: Bi-weekly rebuilds (1st and 15th) with Trivy security scanning
 
 ## Example Projects
 
@@ -165,8 +165,8 @@ jobs:
 ## Release Process
 
 ```bash
-git tag v1.10.0
-git push origin v1.10.0
+git tag v1.11.0
+git push origin v1.11.0
 ```
 
 This triggers the CI workflow which:
