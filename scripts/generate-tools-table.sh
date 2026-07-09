@@ -1,17 +1,31 @@
 #!/bin/bash
 # Generate tools version table for mjolnir container
 
-set -e
+set -euo pipefail
 
 OUTPUT_FILE="${1:-/etc/mjolnir/TOOLS_TABLE}"
 
-# Helper function to get version
-get_version() {
-    local cmd="$1"
-    local version
-    version=$($cmd 2>/dev/null | head -1) || version="not found"
-    echo "$version"
-}
+# Fail loudly if any expected tool is missing. This script runs during the
+# image build, so it doubles as the build-time smoke test: a broken tool
+# install must abort the build instead of silently rendering a blank cell.
+REQUIRED_TOOLS=(
+    go rustc cargo node npm pnpm python3 pip3 bun tsc
+    task gcc goreleaser golangci-lint sqlc buf
+    protoc-gen-go protoc-gen-go-grpc mockgen air xc
+    gitleaks govulncheck cosign syft docker hadolint yq jq
+    git curl glix
+)
+missing=0
+for tool in "${REQUIRED_TOOLS[@]}"; do
+    if ! command -v "$tool" >/dev/null 2>&1; then
+        echo "ERROR: required tool not found on PATH: $tool" >&2
+        missing=1
+    fi
+done
+if [ "$missing" -ne 0 ]; then
+    echo "ERROR: tools table generation aborted - missing tools listed above." >&2
+    exit 1
+fi
 
 # Build the table
 cat > "$OUTPUT_FILE" << 'HEADER'
@@ -71,7 +85,7 @@ printf "│ %-16s │ %-56s │\n" "Task" "$(task --version | head -1)" >> "$OUT
 printf "│ %-16s │ %-56s │\n" "GCC" "$(gcc --version | head -1 | awk '{print $NF}')" >> "$OUTPUT_FILE"
 printf "│ %-16s │ %-56s │\n" "GoReleaser" "$(goreleaser --version 2>&1 | grep GitVersion | awk '{print $2}')" >> "$OUTPUT_FILE"
 printf "│ %-16s │ %-56s │\n" "TypeScript" "$(tsc --version | awk '{print $2}')" >> "$OUTPUT_FILE"
-printf "│ %-16s │ %-56s │\n" "air" "$(air -v 2>&1 | grep -oP 'v[\d.]+')" >> "$OUTPUT_FILE"
+printf "│ %-16s │ %-56s │\n" "air" "$(air -v 2>&1 | sed -n 's/.*\(v[0-9][0-9.]*\).*/\1/p' | head -1)" >> "$OUTPUT_FILE"
 printf "│ %-16s │ %-56s │\n" "xc" "$(xc -version | awk '{print $3}')" >> "$OUTPUT_FILE"
 
 cat >> "$OUTPUT_FILE" << 'EOF'
