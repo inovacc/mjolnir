@@ -1,0 +1,71 @@
+# Dependabot configuration for mjolnir.
+# Covers the CI workflows plus every example project's package ecosystem so
+# dependency and action bumps arrive as reviewed PRs instead of drifting.
+# Note: the in-image build tools installed in the Dockerfiles are fetched at
+# runtime (curl/GitHub releases), which Dependabot cannot track — those are
+# pinned and bumped via the hardening runbook (H-01), not here.
+version: 2
+updates:
+  # --- GitHub Actions used by ci.yml / scheduled-build.yml ---
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "ci"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    groups:
+      actions:
+        patterns:
+          - "*"
+
+  # --- examples/go (Go modules) ---
+  - package-ecosystem: "gomod"
+    directory: "/examples/go"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "deps(go)"
+    labels:
+      - "dependencies"
+      - "go"
+
+  # --- examples/rust (Cargo) ---
+  - package-ecosystem: "cargo"
+    directory: "/examples/rust"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "deps(rust)"
+    labels:
+      - "dependencies"
+      - "rust"
+
+  # --- examples/typescript (npm / package.json) ---
+  - package-ecosystem: "npm"
+    directory: "/examples/typescript"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "deps(ts)"
+    labels:
+      - "dependencies"
+      - "javascript"
+
+  # --- examples/python (pip / requirements.txt) ---
+  - package-ecosystem: "pip"
+    directory: "/examples/python"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "deps(py)"
+    labels:
+      - "dependencies"
+      - "python"
