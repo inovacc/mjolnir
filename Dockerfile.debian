@@ -1,7 +1,9 @@
 # ============================================
 # Stage 1: Builder - compile lightweight Go tools only
 # ============================================
-FROM golang:1.25 AS builder
+# Single source of the Go version for both stages (override with --build-arg).
+ARG GO_VERSION=1.25
+FROM golang:${GO_VERSION} AS builder
 
 ARG HTTP_PROXY=
 ARG HTTPS_PROXY=
@@ -29,7 +31,7 @@ RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@${PROTOC_GEN_GO_VERS
 # ============================================
 # Stage 2: Final - download pre-built + runtime
 # ============================================
-FROM golang:1.25
+FROM golang:${GO_VERSION}
 
 ARG HTTP_PROXY=
 ARG HTTPS_PROXY=

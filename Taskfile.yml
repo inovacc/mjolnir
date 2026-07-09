@@ -64,7 +64,7 @@ tasks:
       - echo "{{.TAG}}" > .build-metadata/BUILD_TAG
       - echo "{{.GO_VERSION}}" > .build-metadata/GO_VERSION
       - echo "{{.RANDOM_NAME}}" > .build-metadata/BUILD_NAME
-      - docker build -f Dockerfile.debian -t ghcr.io/inovacc/mjolnir:{{.TAG}} -t ghcr.io/inovacc/mjolnir:debian .
+      - docker build --build-arg GO_VERSION={{.GO_VERSION}} -f Dockerfile.debian -t ghcr.io/inovacc/mjolnir:{{.TAG}} -t ghcr.io/inovacc/mjolnir:debian .
       - echo "Built ghcr.io/inovacc/mjolnir:{{.TAG}}"
 
   docker:build:alpine:
@@ -78,7 +78,7 @@ tasks:
       - echo "{{.TAG}}" > .build-metadata/BUILD_TAG
       - echo "{{.GO_VERSION}}" > .build-metadata/GO_VERSION
       - echo "{{.RANDOM_NAME}}" > .build-metadata/BUILD_NAME
-      - docker build -f Dockerfile.alpine -t ghcr.io/inovacc/mjolnir:{{.TAG}} -t ghcr.io/inovacc/mjolnir:alpine .
+      - docker build --build-arg GO_VERSION={{.GO_VERSION}} -f Dockerfile.alpine -t ghcr.io/inovacc/mjolnir:{{.TAG}} -t ghcr.io/inovacc/mjolnir:alpine .
       - echo "Built ghcr.io/inovacc/mjolnir:{{.TAG}}"
 
   docker:build:both:
@@ -94,10 +94,10 @@ tasks:
       - echo "{{.TAG_DEBIAN}}" > .build-metadata/BUILD_TAG
       - echo "{{.GO_VERSION}}" > .build-metadata/GO_VERSION
       - echo "{{.RANDOM_NAME}}" > .build-metadata/BUILD_NAME
-      - docker build -f Dockerfile.debian -t ghcr.io/inovacc/mjolnir:{{.TAG_DEBIAN}} -t ghcr.io/inovacc/mjolnir:debian .
+      - docker build --build-arg GO_VERSION={{.GO_VERSION}} -f Dockerfile.debian -t ghcr.io/inovacc/mjolnir:{{.TAG_DEBIAN}} -t ghcr.io/inovacc/mjolnir:debian .
       # Build Alpine
       - echo "{{.TAG_ALPINE}}" > .build-metadata/BUILD_TAG
-      - docker build -f Dockerfile.alpine -t ghcr.io/inovacc/mjolnir:{{.TAG_ALPINE}} -t ghcr.io/inovacc/mjolnir:alpine .
+      - docker build --build-arg GO_VERSION={{.GO_VERSION}} -f Dockerfile.alpine -t ghcr.io/inovacc/mjolnir:{{.TAG_ALPINE}} -t ghcr.io/inovacc/mjolnir:alpine .
       - 'echo "Built images:"'
       - 'echo "  Debian: {{.TAG_DEBIAN}}"'
       - 'echo "  Alpine: {{.TAG_ALPINE}}"'

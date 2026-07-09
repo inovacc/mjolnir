@@ -9,6 +9,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
+  GO_VERSION: "1.25"
 
 jobs:
   lint:
@@ -105,6 +106,7 @@ jobs:
           cache-to: type=gha,mode=max,scope=${{ matrix.variant }}
           build-args: |
             BUILD_VERSION=${{ steps.version.outputs.version }}
+            GO_VERSION=${{ env.GO_VERSION }}
 
       # H-02: real smoke test — assert every expected tool is on PATH.
       # Runs on every build (PR and release), unlike the old release-skipped cat.

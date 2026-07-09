@@ -43,6 +43,8 @@ jobs:
           # cached ones. cache-to still refreshes the shared cache for PR builds.
           no-cache: true
           cache-to: type=gha,mode=max,scope=debian
+          build-args: |
+            GO_VERSION=${{ env.GO_VERSION }}
 
       - name: Verify Debian image
         run: docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
@@ -95,6 +97,8 @@ jobs:
           # cached ones. cache-to still refreshes the shared cache for PR builds.
           no-cache: true
           cache-to: type=gha,mode=max,scope=alpine
+          build-args: |
+            GO_VERSION=${{ env.GO_VERSION }}
 
       - name: Verify Alpine image
         run: docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest-alpine
