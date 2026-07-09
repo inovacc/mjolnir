@@ -38,7 +38,10 @@ jobs:
           push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-          cache-from: type=gha,scope=debian
+          # H-05: force a from-scratch rebuild so the scheduled "security
+          # rebuild" actually pulls fresh base/apt layers instead of reusing
+          # cached ones. cache-to still refreshes the shared cache for PR builds.
+          no-cache: true
           cache-to: type=gha,mode=max,scope=debian
 
       - name: Verify Debian image
@@ -87,7 +90,10 @@ jobs:
           push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest-alpine
-          cache-from: type=gha,scope=alpine
+          # H-05: force a from-scratch rebuild so the scheduled "security
+          # rebuild" actually pulls fresh base/apk layers instead of reusing
+          # cached ones. cache-to still refreshes the shared cache for PR builds.
+          no-cache: true
           cache-to: type=gha,mode=max,scope=alpine
 
       - name: Verify Alpine image
