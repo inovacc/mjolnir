@@ -88,30 +88,56 @@ jobs:
             TAGS="${IMAGE}:dev${SUFFIX}"
           fi
           echo "tags=${TAGS}" >> $GITHUB_OUTPUT
+          echo "primary=${TAGS%%,*}" >> $GITHUB_OUTPUT
 
-      - name: Build and push
+      # Build and load locally (single platform) so we can smoke-test and scan
+      # the exact image BEFORE it is ever pushed. Push happens in a later,
+      # release-only step once both gates pass.
+      - name: Build image
         uses: docker/build-push-action@v6
         with:
           context: .
           file: ${{ matrix.dockerfile }}
-          push: ${{ steps.version.outputs.is_release == 'true' }}
-          load: ${{ steps.version.outputs.is_release != 'true' }}
+          push: false
+          load: true
           tags: ${{ steps.tags.outputs.tags }}
           cache-from: type=gha,scope=${{ matrix.variant }}
           cache-to: type=gha,mode=max,scope=${{ matrix.variant }}
           build-args: |
             BUILD_VERSION=${{ steps.version.outputs.version }}
 
-      - name: Verify tools
-        if: steps.version.outputs.is_release != 'true'
+      # H-02: real smoke test — assert every expected tool is on PATH.
+      # Runs on every build (PR and release), unlike the old release-skipped cat.
+      - name: Smoke test tools
         run: |
-          docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:dev${{ matrix.suffix }} || \
-          docker run --rm $(echo "${{ steps.tags.outputs.tags }}" | cut -d',' -f1)
+          docker run --rm "${{ steps.tags.outputs.primary }}" bash -c '
+            set -eu
+            for t in go rustc cargo node npm pnpm python3 pip3 bun tsc \
+                     task gcc goreleaser golangci-lint sqlc buf \
+                     protoc-gen-go protoc-gen-go-grpc mockgen air xc \
+                     gitleaks govulncheck cosign syft hadolint yq jq \
+                     git curl glix docker; do
+              command -v "$t" >/dev/null || { echo "MISSING TOOL: $t"; exit 1; }
+            done
+            echo "smoke test passed: all expected tools present"
+          '
 
-      - name: Scan image
-        uses: aquasecurity/trivy-action@v0.35.0
+      # H-03: gating scan BEFORE push. Fails the build on a fixable CRITICAL.
+      # (HIGH/unfixable noise is reported via the SARIF step below, not gated.)
+      - name: Scan image (gate on fixable CRITICAL)
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
-          image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.version }}${{ matrix.suffix }}
+          image-ref: ${{ steps.tags.outputs.primary }}
+          format: 'table'
+          severity: 'CRITICAL'
+          ignore-unfixed: true
+          exit-code: '1'
+
+      # Non-gating full report for GitHub code scanning.
+      - name: Scan image (SARIF report)
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: ${{ steps.tags.outputs.primary }}
           format: 'sarif'
           output: 'trivy-${{ matrix.variant }}.sarif'
           severity: 'CRITICAL,HIGH'
@@ -124,3 +150,11 @@ jobs:
           sarif_file: 'trivy-${{ matrix.variant }}.sarif'
           category: ${{ matrix.variant }}
         continue-on-error: true
+
+      # Only now, after smoke test + CRITICAL gate pass, publish (release only).
+      - name: Push image
+        if: steps.version.outputs.is_release == 'true'
+        run: |
+          for tag in $(echo "${{ steps.tags.outputs.tags }}" | tr ',' ' '); do
+            docker push "$tag"
+          done
