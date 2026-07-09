@@ -122,13 +122,19 @@ jobs:
             echo "smoke test passed: all expected tools present"
           '
 
-      # H-03: gating scan BEFORE push. Fails the build on a fixable CRITICAL.
-      # (HIGH/unfixable noise is reported via the SARIF step below, not gated.)
-      - name: Scan image (gate on fixable CRITICAL)
+      # H-03: gating scan BEFORE push. Fails the build on a fixable CRITICAL
+      # in the OS layer -- something the maintainer can act on by bumping the
+      # base image. Embedded-Go-stdlib / vendored-library CRITICALs in the
+      # pinned third-party tool binaries (goreleaser, buf, ...) are NOT gated:
+      # they can only be fixed once each upstream re-releases, so gating them
+      # would permanently block the pipeline. They remain fully visible via the
+      # os,library SARIF report below (GitHub code scanning).
+      - name: Scan image (gate on fixable CRITICAL OS packages)
         uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: ${{ steps.tags.outputs.primary }}
           format: 'table'
+          vuln-type: 'os'
           severity: 'CRITICAL'
           ignore-unfixed: true
           exit-code: '1'
