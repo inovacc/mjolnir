@@ -11,9 +11,9 @@ OUTPUT_FILE="${1:-/etc/mjolnir/TOOLS_TABLE}"
 REQUIRED_TOOLS=(
     go rustc cargo node npm pnpm python3 pip3 bun tsc
     task gcc goreleaser golangci-lint sqlc buf
-    protoc-gen-go protoc-gen-go-grpc mockgen air xc
+    protoc-gen-go protoc-gen-go-grpc mockgen xc
     gitleaks govulncheck cosign syft docker hadolint yq jq
-    git curl glix
+    git curl
 )
 missing=0
 for tool in "${REQUIRED_TOOLS[@]}"; do
@@ -85,7 +85,6 @@ printf "│ %-16s │ %-56s │\n" "Task" "$(task --version | head -1)" >> "$OUT
 printf "│ %-16s │ %-56s │\n" "GCC" "$(gcc --version | head -1 | awk '{print $NF}')" >> "$OUTPUT_FILE"
 printf "│ %-16s │ %-56s │\n" "GoReleaser" "$(goreleaser --version 2>&1 | grep GitVersion | awk '{print $2}')" >> "$OUTPUT_FILE"
 printf "│ %-16s │ %-56s │\n" "TypeScript" "$(tsc --version | awk '{print $2}')" >> "$OUTPUT_FILE"
-printf "│ %-16s │ %-56s │\n" "air" "$(air -v 2>&1 | sed -n 's/.*\(v[0-9][0-9.]*\).*/\1/p' | head -1)" >> "$OUTPUT_FILE"
 printf "│ %-16s │ %-56s │\n" "xc" "$(xc -version | awk '{print $3}')" >> "$OUTPUT_FILE"
 
 cat >> "$OUTPUT_FILE" << 'EOF'
@@ -148,8 +147,6 @@ EOF
 
 printf "│ %-16s │ %-56s │\n" "git" "$(git --version | awk '{print $3}')" >> "$OUTPUT_FILE"
 printf "│ %-16s │ %-56s │\n" "curl" "$(curl --version | head -1 | awk '{print $2}')" >> "$OUTPUT_FILE"
-printf "│ %-16s │ %-56s │\n" "glix" "$(glix version 2>/dev/null || glix --version 2>/dev/null || (which glix >/dev/null 2>&1 && echo 'installed' || echo 'not found'))" >> "$OUTPUT_FILE"
-
 cat >> "$OUTPUT_FILE" << 'EOF'
 └──────────────────┴──────────────────────────────────────────────────────────┘
 EOF

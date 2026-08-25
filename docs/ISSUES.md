@@ -4,7 +4,6 @@
 
 | ID | Severity | Issue | Workaround |
 |----|----------|-------|------------|
-| I-001 | Low | glix version display shows "installed" instead of actual version | Falls back gracefully; `glix version` attempted first in v1.11.0 |
 | I-002 | Info | GitHub Issue #1 — "more tools" requested | See BACKLOG B-004 for candidate list |
 | I-003 | Info | No automated smoke tests — broken tool installs only caught by manual inspection | CI verifies container runs and displays tools table, but doesn't test each binary |
 

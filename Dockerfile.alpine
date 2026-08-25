@@ -1,7 +1,7 @@
 # ============================================
 # Stage 1: Builder - compile lightweight Go tools only
 # ============================================
-FROM golang:1.25-alpine AS builder
+FROM golang:1.27.0-alpine AS builder
 
 ARG HTTP_PROXY=
 ARG HTTPS_PROXY=
@@ -16,24 +16,20 @@ RUN apk add --no-cache git
 ARG PROTOC_GEN_GO_VERSION=v1.36.11
 ARG PROTOC_GEN_GO_GRPC_VERSION=v1.6.2
 ARG MOCKGEN_VERSION=v0.6.0
-ARG AIR_VERSION=v1.65.3
 ARG XC_VERSION=v0.9.0
 ARG GOVULNCHECK_VERSION=v1.6.0
-ARG GLIX_VERSION=v0.0.0-20260126045929-d3f5ddc3bee3
 
 # Install only lightweight Go tools (no pre-built binaries available)
 RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@${PROTOC_GEN_GO_VERSION} \
  && go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@${PROTOC_GEN_GO_GRPC_VERSION} \
  && go install go.uber.org/mock/mockgen@${MOCKGEN_VERSION} \
- && go install github.com/air-verse/air@${AIR_VERSION} \
  && go install github.com/joerdav/xc/cmd/xc@${XC_VERSION} \
- && go install golang.org/x/vuln/cmd/govulncheck@${GOVULNCHECK_VERSION} \
- && go install github.com/inovacc/glix@${GLIX_VERSION}
+ && go install golang.org/x/vuln/cmd/govulncheck@${GOVULNCHECK_VERSION}
 
 # ============================================
 # Stage 2: Final - download pre-built + runtime
 # ============================================
-FROM golang:1.25-alpine
+FROM golang:1.27.0-alpine
 
 ARG HTTP_PROXY=
 ARG HTTPS_PROXY=
@@ -95,7 +91,18 @@ RUN mkdir -p /etc/mjolnir && \
     echo "${BUILD_VERSION}" > /etc/mjolnir/BUILD_VERSION && \
     /usr/local/bin/generate-tools-table.sh /etc/mjolnir/TOOLS_TABLE
 
-ENV PATH="/go/bin:${PATH}"
+ENV CARGO_HOME=/usr/local/cargo \
+    HOME=/home/builder \
+    PATH="/go/bin:/usr/local/cargo/bin:${PATH}" \
+    UMASK=027
+
+# Run GitHub Actions build steps as an unprivileged user. Toolchains and cache
+# roots are prepared before the privilege drop so cargo/go/bun remain usable.
+RUN addgroup -S builder && adduser -S -G builder -s /bin/bash builder && \
+    mkdir -p /usr/local/cargo /home/builder/.cache /workspace && \
+    chown -R builder:builder /usr/local/cargo /home/builder /workspace /go
+
+USER builder
 
 # Labels with build metadata
 LABEL org.opencontainers.image.title="mjolnir" \

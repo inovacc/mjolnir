@@ -48,7 +48,7 @@ graph TD
 ```mermaid
 graph LR
     subgraph "Stage 1: Compile Go Tools"
-        GO_INSTALL["go install @latest<br/>protoc-gen-go<br/>protoc-gen-go-grpc<br/>mockgen, air, xc<br/>govulncheck, glix"]
+        GO_INSTALL["go install @pinned<br/>protoc-gen-go<br/>protoc-gen-go-grpc<br/>mockgen, xc<br/>govulncheck"]
     end
 
     subgraph "Stage 2: Assemble Image"
@@ -94,9 +94,9 @@ mjolnir/
 
 | Method | Tools | Reproducibility |
 |--------|-------|-----------------|
-| `go install @latest` | protoc-gen-go, protoc-gen-go-grpc, mockgen, air, xc, govulncheck, glix | Low (unpinned) |
+| `go install @pinned` | protoc-gen-go, protoc-gen-go-grpc, mockgen, xc, govulncheck | Medium (version-pinned) |
 | GitHub Releases API (`latest`) | goreleaser, cosign, gitleaks, sqlc, buf, hadolint, yq | Low (unpinned) |
 | Install scripts (`latest`) | golangci-lint, syft, task, bun | Low (unpinned) |
 | OS package manager | git, curl, jq, python3, Node.js, npm, gcc | Medium (base image pins) |
 | Pinned version | Docker CLI (27.5.1), TypeScript (5.9.3) | High |
-| Channel | Rust (stable), Go (1.25.x) | Medium |
+| Channel | Rust (stable), Go (1.27.0) | Medium |
