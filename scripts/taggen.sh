@@ -50,7 +50,7 @@ get_go_version() {
     if [[ -n "$GO_VERSION" ]]; then
         echo "$GO_VERSION"
     else
-        echo "1.25"
+        echo "1.27.0"
     fi
 }
 
@@ -88,12 +88,12 @@ for arg in "$@"; do
             echo "  --version    Print only Go version"
             echo ""
             echo "Environment:"
-            echo "  GO_VERSION   Override Go version (default: 1.25)"
+            echo "  GO_VERSION   Override Go version (default: 1.27.0)"
             echo ""
             echo "Examples:"
-            echo "  taggen.sh           # 1.25-thor-asgard"
-            echo "  taggen.sh -A        # 1.25A-zeus-olympus"
-            echo "  taggen.sh -D        # 1.25D-odin-valhalla"
+            echo "  taggen.sh           # 1.27.0-thor-asgard"
+            echo "  taggen.sh -A        # 1.27.0A-zeus-olympus"
+            echo "  taggen.sh -D        # 1.27.0D-odin-valhalla"
             exit 0
             ;;
     esac

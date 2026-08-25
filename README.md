@@ -6,7 +6,12 @@
 [![CI Workflow](https://github.com/inovacc/mjolnir/actions/workflows/ci.yml/badge.svg)](https://github.com/inovacc/mjolnir/actions/workflows/ci.yml)
 [![License](https://img.shields.io/github/license/inovacc/mjolnir)](LICENSE)
 
-A powerful multi-language build container for GitHub Actions. Forge your builds with the power of gods.
+A hardened multi-language build container for GitHub Actions artifact production. Forge
+reproducible Go, Rust, Bun, and Node builds with the power of gods.
+
+The image runs workflow steps as the unprivileged `builder` user, keeps tool downloads
+checksum-verified where upstream manifests are available, emits SBOM/provenance in CI, and
+does not include development-only live-reload or module-manager helpers.
 
 ```bash
 # Debian-based (default)
@@ -32,8 +37,8 @@ docker pull ghcr.io/inovacc/mjolnir:alpine
 
 | Flavor | Base | Tag | Size |
 |--------|------|-----|------|
-| Debian | `golang:1.25` | `latest`, `debian` | ~1.6GB |
-| Alpine | `golang:1.25-alpine` | `alpine` | ~700MB |
+| Debian | `golang:1.27.0` | `latest`, `debian` | ~1.6GB |
+| Alpine | `golang:1.27.0-alpine` | `alpine` | ~700MB |
 
 ## Included Tools
 
@@ -41,7 +46,7 @@ docker pull ghcr.io/inovacc/mjolnir:alpine
 
 | Tool | Version | Purpose |
 |------|---------|---------|
-| Go | 1.25 | Go toolchain |
+| Go | 1.27.0 | Go toolchain |
 | Task | latest | Task runner |
 | GoReleaser | latest | Release automation |
 | SQLC | latest | SQL code generator |
@@ -50,8 +55,9 @@ docker pull ghcr.io/inovacc/mjolnir:alpine
 | protoc-gen-go-grpc | latest | Go gRPC generator |
 | golangci-lint | latest | Go linters aggregator |
 | govulncheck | latest | Go vulnerability scanner |
+| staticcheck | latest | Go static analysis |
+| gotestsum | 1.13.0 | Go test runner and JUnit output |
 | mockgen | latest | Go mock generator |
-| air | latest | Live reload for development |
 | xc | latest | Markdown-based task runner |
 
 ### Security & Signing
@@ -77,14 +83,20 @@ docker pull ghcr.io/inovacc/mjolnir:alpine
 | Tool | Version | Purpose |
 |------|---------|---------|
 | Python 3 | OS package | Python runtime |
-| Rust (rustc) | stable | Rust compiler |
-| Cargo | stable | Rust package manager |
+| Rust (rustc) | 1.98.0 | Rust compiler |
+| Cargo | 1.98.0 | Rust package manager |
+| cargo-nextest | 0.9.137 | Parallel Rust test runner |
+| cargo-deny | 0.18.7 | Rust dependency policy checks |
+| cargo-chef | 0.1.74 | Rust dependency layer caching |
+| cargo-audit | 0.22.0 | RustSec vulnerability audit |
+| cargo-llvm-cov | 0.6.19 | Rust coverage instrumentation |
 
 ### Containers & Linting
 
 | Tool | Version | Purpose |
 |------|---------|---------|
 | Docker CLI | 27.5.1 | Docker command-line tool |
+| mold | system | Fast Linux linker |
 | hadolint | latest | Dockerfile linter |
 
 ### Data Processing
@@ -102,7 +114,6 @@ docker pull ghcr.io/inovacc/mjolnir:alpine
 | curl | OS package | HTTP client |
 | Make | OS package | Build automation |
 | GCC | OS package | C/C++ compiler |
-| glix | latest | Go module manager |
 
 ## Image Tagging
 
@@ -116,14 +127,14 @@ Images use mythology-themed tags with Go version, flavor suffix, and divine name
 
 | Component | Alpine | Debian | Purpose |
 |-----------|--------|--------|---------|
-| Go version | `1.25` | `1.25` | Go toolchain version |
+| Go version | `1.27.0` | `1.27.0` | Go toolchain version |
 | Flavor | `A` | `D` | Alpine or Debian |
 | Figure | `thor` | `thor` | Mythological figure |
 | Realm | `asgard` | `asgard` | Divine realm/attribute |
 
 **Examples:**
-- Alpine: `ghcr.io/inovacc/mjolnir:1.25A-thor-asgard`
-- Debian: `ghcr.io/inovacc/mjolnir:1.25D-zeus-olympus`
+- Alpine: `ghcr.io/inovacc/mjolnir:1.27.0A-thor-asgard`
+- Debian: `ghcr.io/inovacc/mjolnir:1.27.0D-zeus-olympus`
 
 ### Available Tags
 
@@ -132,17 +143,17 @@ Images use mythology-themed tags with Go version, flavor suffix, and divine name
 | `latest` | Latest Debian build |
 | `debian` | Latest Debian build |
 | `alpine` | Latest Alpine build |
-| `1.25D-<figure>-<realm>` | Specific Debian build |
-| `1.25A-<figure>-<realm>` | Specific Alpine build |
+| `1.27.0D-<figure>-<realm>` | Specific Debian build |
+| `1.27.0A-<figure>-<realm>` | Specific Alpine build |
 | `x.y.z` | Semantic version release |
 
 ### Local Tag Generation
 
 ```bash
 # Generate tags
-task taggen              # Full Debian tag: 1.25D-odin-valhalla
-task taggen:alpine       # Full Alpine tag: 1.25A-odin-valhalla
-task taggen:debian       # Full Debian tag: 1.25D-odin-valhalla
+task taggen              # Full Debian tag: 1.27.0D-odin-valhalla
+task taggen:alpine       # Full Alpine tag: 1.27.0A-odin-valhalla
+task taggen:debian       # Full Debian tag: 1.27.0D-odin-valhalla
 task taggen:name         # Random name only: odin-valhalla
 
 # Build images

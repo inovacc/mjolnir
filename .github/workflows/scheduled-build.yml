@@ -9,7 +9,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-  GO_VERSION: "1.25"
+  GO_VERSION: "1.27.0"
 
 jobs:
   build-and-push-debian:
@@ -19,7 +19,7 @@ jobs:
       packages: write
       security-events: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: docker/setup-buildx-action@v3
 
@@ -45,7 +45,7 @@ jobs:
           cache-to: type=gha,mode=max,scope=debian
 
       - name: Verify Debian image
-        run: docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+        run: docker run --rm --read-only --tmpfs /tmp --security-opt=no-new-privileges ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
 
       - name: Scan Debian image
         uses: aquasecurity/trivy-action@v0.35.0
@@ -71,7 +71,7 @@ jobs:
       packages: write
       security-events: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: docker/setup-buildx-action@v3
 
@@ -97,7 +97,7 @@ jobs:
           cache-to: type=gha,mode=max,scope=alpine
 
       - name: Verify Alpine image
-        run: docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest-alpine
+        run: docker run --rm --read-only --tmpfs /tmp --security-opt=no-new-privileges ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest-alpine
 
       - name: Scan Alpine image
         uses: aquasecurity/trivy-action@v0.35.0

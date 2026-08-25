@@ -11,9 +11,11 @@ OUTPUT_FILE="${1:-/etc/mjolnir/TOOLS_TABLE}"
 REQUIRED_TOOLS=(
     go rustc cargo node npm pnpm python3 pip3 bun tsc
     task gcc goreleaser golangci-lint sqlc buf
-    protoc-gen-go protoc-gen-go-grpc mockgen air xc
+    protoc-gen-go protoc-gen-go-grpc mockgen staticcheck gotestsum xc
+    cargo-nextest cargo-deny cargo-chef cargo-audit cargo-llvm-cov
+    mold
     gitleaks govulncheck cosign syft docker hadolint yq jq
-    git curl glix
+    git curl
 )
 missing=0
 for tool in "${REQUIRED_TOOLS[@]}"; do
@@ -85,8 +87,10 @@ printf "│ %-16s │ %-56s │\n" "Task" "$(task --version | head -1)" >> "$OUT
 printf "│ %-16s │ %-56s │\n" "GCC" "$(gcc --version | head -1 | awk '{print $NF}')" >> "$OUTPUT_FILE"
 printf "│ %-16s │ %-56s │\n" "GoReleaser" "$(goreleaser --version 2>&1 | grep GitVersion | awk '{print $2}')" >> "$OUTPUT_FILE"
 printf "│ %-16s │ %-56s │\n" "TypeScript" "$(tsc --version | awk '{print $2}')" >> "$OUTPUT_FILE"
-printf "│ %-16s │ %-56s │\n" "air" "$(air -v 2>&1 | sed -n 's/.*\(v[0-9][0-9.]*\).*/\1/p' | head -1)" >> "$OUTPUT_FILE"
 printf "│ %-16s │ %-56s │\n" "xc" "$(xc -version | awk '{print $3}')" >> "$OUTPUT_FILE"
+printf "│ %-16s │ %-56s │\n" "staticcheck" "$(staticcheck --version | head -1)" >> "$OUTPUT_FILE"
+printf "│ %-16s │ %-56s │\n" "gotestsum" "$(gotestsum --version | head -1)" >> "$OUTPUT_FILE"
+printf "│ %-16s │ %-56s │\n" "mold" "$(mold --version | head -1)" >> "$OUTPUT_FILE"
 
 cat >> "$OUTPUT_FILE" << 'EOF'
 └──────────────────┴──────────────────────────────────────────────────────────┘
@@ -101,6 +105,11 @@ printf "│ %-16s │ %-56s │\n" "buf" "$(buf --version)" >> "$OUTPUT_FILE"
 printf "│ %-16s │ %-56s │\n" "protoc-gen-go" "$(protoc-gen-go --version | awk '{print $2}')" >> "$OUTPUT_FILE"
 printf "│ %-16s │ %-56s │\n" "protoc-go-grpc" "$(protoc-gen-go-grpc --version | awk '{print $2}')" >> "$OUTPUT_FILE"
 printf "│ %-16s │ %-56s │\n" "mockgen" "$(mockgen --version | awk '{print $NF}')" >> "$OUTPUT_FILE"
+printf "│ %-16s │ %-56s │\n" "cargo-nextest" "$(cargo nextest --version)" >> "$OUTPUT_FILE"
+printf "│ %-16s │ %-56s │\n" "cargo-deny" "$(cargo deny --version)" >> "$OUTPUT_FILE"
+printf "│ %-16s │ %-56s │\n" "cargo-chef" "$(cargo chef --version)" >> "$OUTPUT_FILE"
+printf "│ %-16s │ %-56s │\n" "cargo-audit" "$(cargo audit --version)" >> "$OUTPUT_FILE"
+printf "│ %-16s │ %-56s │\n" "cargo-llvm-cov" "$(cargo llvm-cov --version)" >> "$OUTPUT_FILE"
 
 cat >> "$OUTPUT_FILE" << 'EOF'
 └──────────────────┴──────────────────────────────────────────────────────────┘
@@ -148,8 +157,6 @@ EOF
 
 printf "│ %-16s │ %-56s │\n" "git" "$(git --version | awk '{print $3}')" >> "$OUTPUT_FILE"
 printf "│ %-16s │ %-56s │\n" "curl" "$(curl --version | head -1 | awk '{print $2}')" >> "$OUTPUT_FILE"
-printf "│ %-16s │ %-56s │\n" "glix" "$(glix version 2>/dev/null || glix --version 2>/dev/null || (which glix >/dev/null 2>&1 && echo 'installed' || echo 'not found'))" >> "$OUTPUT_FILE"
-
 cat >> "$OUTPUT_FILE" << 'EOF'
 └──────────────────┴──────────────────────────────────────────────────────────┘
 EOF

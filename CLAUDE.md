@@ -14,8 +14,8 @@ Repository: `ghcr.io/inovacc/mjolnir`
 
 | Variant | Base | Use Case |
 |---------|------|----------|
-| **Debian** (default) | `golang:1.25` | Full-featured, wider compatibility |
-| **Alpine** | `golang:1.25-alpine` | Smaller image, musl libc |
+| **Debian** (default) | `golang:1.27.0` | Full-featured, wider compatibility |
+| **Alpine** | `golang:1.27.0-alpine` | Smaller image, musl libc |
 
 ## Tagging Scheme
 
@@ -31,8 +31,8 @@ ghcr.io/inovacc/mjolnir:latest-alpine   # Latest Alpine
 ### Languages & Runtimes
 | Tool | Description |
 |------|-------------|
-| Go 1.25 | Go compiler and tools |
-| Rust (stable) | rustc, cargo |
+| Go 1.27.0 | Go compiler and tools |
+| Rust 1.98.0 | rustc, cargo |
 | Node.js | Node.js runtime |
 | Python 3 | Python interpreter |
 | Bun | Fast JavaScript runtime |
@@ -54,8 +54,8 @@ ghcr.io/inovacc/mjolnir:latest-alpine   # Latest Alpine
 | GCC | C compiler |
 | GoReleaser | Go release automation |
 | tsc | TypeScript compiler |
-| air | Go live reload for development |
 | xc | Task runner (Markdown-based) |
+| mold | Fast Linux linker |
 
 ### Code Generation
 | Tool | Description |
@@ -65,6 +65,17 @@ ghcr.io/inovacc/mjolnir:latest-alpine   # Latest Alpine
 | protoc-gen-go | Go protobuf generator |
 | protoc-gen-go-grpc | Go gRPC generator |
 | mockgen | Go mock generator |
+| staticcheck | Go static analysis |
+| gotestsum | Go test runner and JUnit output |
+
+### Rust Build & Quality
+| Tool | Description |
+|------|-------------|
+| cargo-nextest | Parallel Rust test runner |
+| cargo-deny | Dependency policy, license, and advisory checks |
+| cargo-chef | Dependency-layer caching for Docker builds |
+| cargo-audit | RustSec vulnerability audit |
+| cargo-llvm-cov | Rust coverage instrumentation |
 
 ### Security & Signing
 | Tool | Description |
@@ -94,16 +105,15 @@ ghcr.io/inovacc/mjolnir:latest-alpine   # Latest Alpine
 | curl | HTTP client |
 | unzip | Archive extraction |
 | bash | Shell |
-| glix | Go module manager |
 
 ## Build Metadata
 
 Each image generates mythology-themed build metadata at `/etc/mjolnir/`:
 
 ```
-/etc/mjolnir/BUILD_TAG      # e.g., "1.25.6D-thor-asgard"
+/etc/mjolnir/BUILD_TAG      # e.g., "1.27.0D-thor-asgard"
 /etc/mjolnir/BUILD_NAME     # e.g., "thor-asgard"
-/etc/mjolnir/GO_VERSION     # e.g., "1.25.6"
+/etc/mjolnir/GO_VERSION     # e.g., "1.27.0"
 /etc/mjolnir/BUILD_VERSION  # e.g., "1.11.0"
 /etc/mjolnir/TOOLS_TABLE    # Pre-generated ASCII table of all tools
 ```
