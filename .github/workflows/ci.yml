@@ -115,8 +115,6 @@ jobs:
           sbom: false
           cache-from: type=gha,scope=${{ matrix.variant }}
           cache-to: type=gha,mode=max,scope=${{ matrix.variant }}
-          provenance: mode=max
-          sbom: true
           build-args: |
             BUILD_VERSION=${{ steps.version.outputs.version }}
 
