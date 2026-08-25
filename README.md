@@ -83,8 +83,8 @@ docker pull ghcr.io/inovacc/mjolnir:alpine
 | Tool | Version | Purpose |
 |------|---------|---------|
 | Python 3 | OS package | Python runtime |
-| Rust (rustc) | stable | Rust compiler |
-| Cargo | stable | Rust package manager |
+| Rust (rustc) | 1.98.0 | Rust compiler |
+| Cargo | 1.98.0 | Rust package manager |
 | cargo-nextest | 0.9.137 | Parallel Rust test runner |
 | cargo-deny | 0.18.7 | Rust dependency policy checks |
 | cargo-chef | 0.1.74 | Rust dependency layer caching |

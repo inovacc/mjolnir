@@ -32,7 +32,7 @@ ghcr.io/inovacc/mjolnir:latest-alpine   # Latest Alpine
 | Tool | Description |
 |------|-------------|
 | Go 1.27.0 | Go compiler and tools |
-| Rust (stable) | rustc, cargo |
+| Rust 1.98.0 | rustc, cargo |
 | Node.js | Node.js runtime |
 | Python 3 | Python interpreter |
 | Bun | Fast JavaScript runtime |

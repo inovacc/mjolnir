@@ -99,4 +99,4 @@ mjolnir/
 | Install scripts (`latest`) | golangci-lint, syft, task, bun | Low (unpinned) |
 | OS package manager | git, curl, jq, python3, Node.js, npm, gcc | Medium (base image pins) |
 | Pinned version | Docker CLI (27.5.1), TypeScript (5.9.3) | High |
-| Channel | Rust (stable), Go (1.27.0) | Medium |
+| Channel | Rust (1.98.0), Go (1.27.0) | Medium |
