@@ -108,6 +108,11 @@ jobs:
           push: false
           load: true
           tags: ${{ steps.tags.outputs.tags }}
+          # Local loading is required for smoke tests. Attestations are emitted
+          # by the release-only registry build below because Docker's local
+          # exporter cannot load an attested manifest list.
+          provenance: false
+          sbom: false
           cache-from: type=gha,scope=${{ matrix.variant }}
           cache-to: type=gha,mode=max,scope=${{ matrix.variant }}
           provenance: mode=max
@@ -169,10 +174,20 @@ jobs:
           category: ${{ matrix.variant }}
         continue-on-error: true
 
-      # Only now, after smoke test + CRITICAL gate pass, publish (release only).
-      - name: Push image
+      # Rebuild directly to the registry after all gates pass. This is separate
+      # from the local smoke-test build so SBOM/provenance attestations remain
+      # enabled without breaking Docker's --load exporter.
+      - name: Push attested image
         if: steps.version.outputs.is_release == 'true'
-        run: |
-          for tag in $(echo "${{ steps.tags.outputs.tags }}" | tr ',' ' '); do
-            docker push "$tag"
-          done
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ${{ matrix.dockerfile }}
+          push: true
+          tags: ${{ steps.tags.outputs.tags }}
+          cache-from: type=gha,scope=${{ matrix.variant }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.variant }}
+          build-args: |
+            BUILD_VERSION=${{ steps.version.outputs.version }}
+          provenance: mode=max
+          sbom: true
