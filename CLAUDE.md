@@ -55,6 +55,7 @@ ghcr.io/inovacc/mjolnir:latest-alpine   # Latest Alpine
 | GoReleaser | Go release automation |
 | tsc | TypeScript compiler |
 | xc | Task runner (Markdown-based) |
+| mold | Fast Linux linker |
 
 ### Code Generation
 | Tool | Description |
@@ -64,6 +65,17 @@ ghcr.io/inovacc/mjolnir:latest-alpine   # Latest Alpine
 | protoc-gen-go | Go protobuf generator |
 | protoc-gen-go-grpc | Go gRPC generator |
 | mockgen | Go mock generator |
+| staticcheck | Go static analysis |
+| gotestsum | Go test runner and JUnit output |
+
+### Rust Build & Quality
+| Tool | Description |
+|------|-------------|
+| cargo-nextest | Parallel Rust test runner |
+| cargo-deny | Dependency policy, license, and advisory checks |
+| cargo-chef | Dependency-layer caching for Docker builds |
+| cargo-audit | RustSec vulnerability audit |
+| cargo-llvm-cov | Rust coverage instrumentation |
 
 ### Security & Signing
 | Tool | Description |

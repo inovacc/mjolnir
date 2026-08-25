@@ -28,6 +28,8 @@ esac
 : "${TASK_VERSION:?}" "${BUF_VERSION:?}" "${HADOLINT_VERSION:?}"
 : "${YQ_VERSION:?}" "${BUN_VERSION:?}" "${PNPM_VERSION:?}"
 : "${TYPESCRIPT_VERSION:?}" "${RUSTUP_VERSION:?}" "${RUST_VERSION:?}"
+: "${CARGO_NEXTEST_VERSION:?}" "${CARGO_DENY_VERSION:?}" "${CARGO_CHEF_VERSION:?}"
+: "${CARGO_AUDIT_VERSION:?}" "${CARGO_LLVM_COV_VERSION:?}"
 : "${DOCKER_VERSION:?}"
 
 GOBIN=/go/bin
@@ -163,6 +165,17 @@ verify_sha256 /tmp/rustup-init "$(sha_from_single "${rustup_base}/rustup-init.sh
 chmod +x /tmp/rustup-init
 /tmp/rustup-init -y --no-modify-path --default-toolchain "${RUST_VERSION}"
 rm -f /tmp/rustup-init
+
+# Rust CI/build helpers. They are compiled once into the image so workflows do
+# not spend their critical path downloading and compiling the same utilities.
+rustup component add llvm-tools-preview
+export CARGO_BUILD_JOBS="${CARGO_BUILD_JOBS:-$(nproc)}"
+cargo install --locked --version "${CARGO_NEXTEST_VERSION}" cargo-nextest
+cargo install --locked --version "${CARGO_DENY_VERSION}" cargo-deny
+cargo install --locked --version "${CARGO_CHEF_VERSION}" cargo-chef
+cargo install --locked --version "${CARGO_AUDIT_VERSION}" cargo-audit
+cargo install --locked --version "${CARGO_LLVM_COV_VERSION}" cargo-llvm-cov
+
 mv /root/.cargo/bin/* "$LOCALBIN/"
 mv /root/.rustup /usr/local/rustup
 

@@ -11,7 +11,9 @@ OUTPUT_FILE="${1:-/etc/mjolnir/TOOLS_TABLE}"
 REQUIRED_TOOLS=(
     go rustc cargo node npm pnpm python3 pip3 bun tsc
     task gcc goreleaser golangci-lint sqlc buf
-    protoc-gen-go protoc-gen-go-grpc mockgen xc
+    protoc-gen-go protoc-gen-go-grpc mockgen staticcheck gotestsum xc
+    cargo-nextest cargo-deny cargo-chef cargo-audit cargo-llvm-cov
+    mold
     gitleaks govulncheck cosign syft docker hadolint yq jq
     git curl
 )
@@ -86,6 +88,9 @@ printf "│ %-16s │ %-56s │\n" "GCC" "$(gcc --version | head -1 | awk '{prin
 printf "│ %-16s │ %-56s │\n" "GoReleaser" "$(goreleaser --version 2>&1 | grep GitVersion | awk '{print $2}')" >> "$OUTPUT_FILE"
 printf "│ %-16s │ %-56s │\n" "TypeScript" "$(tsc --version | awk '{print $2}')" >> "$OUTPUT_FILE"
 printf "│ %-16s │ %-56s │\n" "xc" "$(xc -version | awk '{print $3}')" >> "$OUTPUT_FILE"
+printf "│ %-16s │ %-56s │\n" "staticcheck" "$(staticcheck --version | head -1)" >> "$OUTPUT_FILE"
+printf "│ %-16s │ %-56s │\n" "gotestsum" "$(gotestsum --version | head -1)" >> "$OUTPUT_FILE"
+printf "│ %-16s │ %-56s │\n" "mold" "$(mold --version | head -1)" >> "$OUTPUT_FILE"
 
 cat >> "$OUTPUT_FILE" << 'EOF'
 └──────────────────┴──────────────────────────────────────────────────────────┘
@@ -100,6 +105,11 @@ printf "│ %-16s │ %-56s │\n" "buf" "$(buf --version)" >> "$OUTPUT_FILE"
 printf "│ %-16s │ %-56s │\n" "protoc-gen-go" "$(protoc-gen-go --version | awk '{print $2}')" >> "$OUTPUT_FILE"
 printf "│ %-16s │ %-56s │\n" "protoc-go-grpc" "$(protoc-gen-go-grpc --version | awk '{print $2}')" >> "$OUTPUT_FILE"
 printf "│ %-16s │ %-56s │\n" "mockgen" "$(mockgen --version | awk '{print $NF}')" >> "$OUTPUT_FILE"
+printf "│ %-16s │ %-56s │\n" "cargo-nextest" "$(cargo nextest --version)" >> "$OUTPUT_FILE"
+printf "│ %-16s │ %-56s │\n" "cargo-deny" "$(cargo deny --version)" >> "$OUTPUT_FILE"
+printf "│ %-16s │ %-56s │\n" "cargo-chef" "$(cargo chef --version)" >> "$OUTPUT_FILE"
+printf "│ %-16s │ %-56s │\n" "cargo-audit" "$(cargo audit --version)" >> "$OUTPUT_FILE"
+printf "│ %-16s │ %-56s │\n" "cargo-llvm-cov" "$(cargo llvm-cov --version)" >> "$OUTPUT_FILE"
 
 cat >> "$OUTPUT_FILE" << 'EOF'
 └──────────────────┴──────────────────────────────────────────────────────────┘

@@ -18,13 +18,17 @@ ARG PROTOC_GEN_GO_GRPC_VERSION=v1.6.2
 ARG MOCKGEN_VERSION=v0.6.0
 ARG XC_VERSION=v0.9.0
 ARG GOVULNCHECK_VERSION=v1.6.0
+ARG STATICCHECK_VERSION=2025.1.1
+ARG GOTESTSUM_VERSION=v1.13.0
 
 # Install only lightweight Go tools (no pre-built binaries available)
 RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@${PROTOC_GEN_GO_VERSION} \
  && go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@${PROTOC_GEN_GO_GRPC_VERSION} \
  && go install go.uber.org/mock/mockgen@${MOCKGEN_VERSION} \
  && go install github.com/joerdav/xc/cmd/xc@${XC_VERSION} \
- && go install golang.org/x/vuln/cmd/govulncheck@${GOVULNCHECK_VERSION}
+ && go install golang.org/x/vuln/cmd/govulncheck@${GOVULNCHECK_VERSION} \
+ && go install honnef.co/go/tools/cmd/staticcheck@${STATICCHECK_VERSION} \
+ && go install gotest.tools/gotestsum@${GOTESTSUM_VERSION}
 
 # ============================================
 # Stage 2: Final - download pre-built + runtime
@@ -54,11 +58,16 @@ ARG PNPM_VERSION=11.10.0
 ARG TYPESCRIPT_VERSION=5.9.3
 ARG RUSTUP_VERSION=1.29.0
 ARG RUST_VERSION=1.97.0
+ARG CARGO_NEXTEST_VERSION=0.9.137
+ARG CARGO_DENY_VERSION=0.18.7
+ARG CARGO_CHEF_VERSION=0.1.74
+ARG CARGO_AUDIT_VERSION=0.22.0
+ARG CARGO_LLVM_COV_VERSION=0.6.19
 ARG DOCKER_VERSION=27.5.1
 
 # Install runtime dependencies (coreutils needed for install scripts)
 # hadolint ignore=DL3018,DL3016,DL4006
-RUN apk add --no-cache git ca-certificates bash make curl unzip jq \
+RUN apk add --no-cache git ca-certificates bash make curl unzip jq mold \
     nodejs npm python3 py3-pip gcc musl-dev coreutils
 
 # Install all prebuilt tools via the shared installer (H-06). Both images run

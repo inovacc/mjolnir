@@ -55,6 +55,8 @@ docker pull ghcr.io/inovacc/mjolnir:alpine
 | protoc-gen-go-grpc | latest | Go gRPC generator |
 | golangci-lint | latest | Go linters aggregator |
 | govulncheck | latest | Go vulnerability scanner |
+| staticcheck | latest | Go static analysis |
+| gotestsum | 1.13.0 | Go test runner and JUnit output |
 | mockgen | latest | Go mock generator |
 | xc | latest | Markdown-based task runner |
 
@@ -83,12 +85,18 @@ docker pull ghcr.io/inovacc/mjolnir:alpine
 | Python 3 | OS package | Python runtime |
 | Rust (rustc) | stable | Rust compiler |
 | Cargo | stable | Rust package manager |
+| cargo-nextest | 0.9.137 | Parallel Rust test runner |
+| cargo-deny | 0.18.7 | Rust dependency policy checks |
+| cargo-chef | 0.1.74 | Rust dependency layer caching |
+| cargo-audit | 0.22.0 | RustSec vulnerability audit |
+| cargo-llvm-cov | 0.6.19 | Rust coverage instrumentation |
 
 ### Containers & Linting
 
 | Tool | Version | Purpose |
 |------|---------|---------|
 | Docker CLI | 27.5.1 | Docker command-line tool |
+| mold | system | Fast Linux linker |
 | hadolint | latest | Dockerfile linter |
 
 ### Data Processing
