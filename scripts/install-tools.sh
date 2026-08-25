@@ -168,6 +168,7 @@ rm -f /tmp/rustup-init
 
 # Rust CI/build helpers. They are compiled once into the image so workflows do
 # not spend their critical path downloading and compiling the same utilities.
+export PATH="/root/.cargo/bin:${PATH}"
 rustup component add llvm-tools-preview
 export CARGO_BUILD_JOBS="${CARGO_BUILD_JOBS:-$(nproc)}"
 cargo install --locked --version "${CARGO_NEXTEST_VERSION}" cargo-nextest
